@@ -43,6 +43,11 @@ public class Rule {
     }
 
     @JsonIgnore
+    public boolean isDisapproved() {
+        return RuleStatus.REPROVADA.equals(status);
+    }
+
+    @JsonIgnore
     public boolean isApiPending() {
         return RuleStatus.API_PENDENTE.equals(status) && !ObjectUtils.isEmpty(apiPendente);
     }

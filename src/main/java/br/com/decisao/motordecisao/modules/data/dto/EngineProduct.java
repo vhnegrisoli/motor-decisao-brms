@@ -1,6 +1,7 @@
 package br.com.decisao.motordecisao.modules.data.dto;
 
 import br.com.decisao.motordecisao.modules.data.enums.ProductId;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -20,4 +21,11 @@ public class EngineProduct {
 
     @JsonProperty("rules")
     private List<Rule> regras = new ArrayList<>();
+
+    @JsonIgnore
+    public boolean isDisapprovedProduct() {
+        return regras
+            .stream()
+            .anyMatch(Rule::isDisapproved);
+    }
 }

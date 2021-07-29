@@ -9,6 +9,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -18,6 +19,9 @@ public class PayloadRequest {
 
     @JsonProperty("products")
     private List<EngineProduct> produtos = new ArrayList<>();
+
+    @JsonProperty("disapprovedProducts")
+    private List<EngineProduct> produtosReprovados = new ArrayList<>();
 
     @JsonProperty("person")
     private Person pessoa = new Person();
@@ -33,5 +37,15 @@ public class PayloadRequest {
             .forEach(product -> product
                 .getRegras()
                 .removeIf(rule -> ObjectUtils.isEmpty(rule) || ObjectUtils.isEmpty(rule.getId())));
+    }
+
+    public void defineDisapprovedProducts() {
+        getProdutos()
+            .stream()
+            .filter(EngineProduct::isDisapprovedProduct)
+            .forEach(disapprovedProduct -> produtosReprovados.add(disapprovedProduct));
+
+        getProdutos()
+            .removeIf(EngineProduct::isDisapprovedProduct);
     }
 }

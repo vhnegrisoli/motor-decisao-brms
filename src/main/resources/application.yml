@@ -2,3 +2,9 @@ spring:
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
+
+  data:
+    mongodb:
+      repositories:
+        enabled: true
+      uri: mongodb://localhost:27017/decision-engine

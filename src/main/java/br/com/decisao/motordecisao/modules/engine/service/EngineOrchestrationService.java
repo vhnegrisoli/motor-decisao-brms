@@ -6,13 +6,19 @@ import br.com.decisao.motordecisao.config.rule.RuleId;
 import br.com.decisao.motordecisao.modules.data.dto.PayloadProduct;
 import br.com.decisao.motordecisao.modules.data.dto.PayloadRequest;
 import br.com.decisao.motordecisao.modules.data.dto.Rule;
+import br.com.decisao.motordecisao.modules.engine.document.EngineEvaluation;
+import br.com.decisao.motordecisao.modules.engine.repository.EngineEvaluationRepository;
 import br.com.decisao.motordecisao.modules.restservices.service.RestCallService;
 import br.com.decisao.motordecisao.modules.rules.service.RuleExecutorService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class EngineOrchestrationService {
 
@@ -22,19 +28,35 @@ public class EngineOrchestrationService {
     @Autowired
     private RestCallService restCallService;
 
-    public PayloadRequest runEngine(PayloadRequest payload) {
+    @Autowired
+    private EngineEvaluationRepository engineEvaluationRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    public EngineEvaluation runEngine(PayloadRequest payload) {
         try {
-            payload
-                .getProdutos()
-                .forEach(produto -> evaluateRules(PayloadProduct.create(payload, produto)));
-            payload.removeNullRules();
-            return payload;
+            logRequest(payload);
+            var startTime = LocalDateTime.now();
+            runProcess(payload);
+            var engineEvaluation = EngineEvaluation.convertFrom(payload, startTime);
+            var response = engineEvaluationRepository.save(engineEvaluation);
+            logResponse(response);
+            return response;
         } catch (Exception ex) {
             throw new ValidacaoException(
                 "Erro ao tentar processar os dados no motor de decisão: "
                     .concat(ex.getMessage())
             );
         }
+    }
+
+    private void runProcess(PayloadRequest payload) {
+        payload
+            .getProdutos()
+            .forEach(produto -> evaluateRules(PayloadProduct.create(payload, produto)));
+        payload.removeNullRules();
+        payload.defineDisapprovedProducts();
     }
 
     private void evaluateRules(PayloadProduct payloadProduto) {
@@ -78,5 +100,23 @@ public class EngineOrchestrationService {
         return keepRunning
             && RuleDefinition.isRuleAvailable(ruleId, payloadProduto.getProduto().getId())
             && !Rule.isAlreadyEvaluatedRule(ruleId, rules);
+    }
+
+    private void logRequest(PayloadRequest payload) {
+        try {
+            log.info("Início da chamada ao endpoint de rodar o moto com payload: {}",
+                objectMapper.writeValueAsString(payload));
+        } catch (Exception ex) {
+            log.error("Erro ao tentar processar JSON de entrada: ", ex);
+        }
+    }
+
+    private void logResponse(EngineEvaluation engineEvaluation) {
+        try {
+            log.info("Payload de resposta da chamada ao endpoint de rodar o moto: {}",
+                objectMapper.writeValueAsString(engineEvaluation));
+        } catch (Exception ex) {
+            log.error("Erro ao tentar processar JSON de saída: ", ex);
+        }
     }
 }
