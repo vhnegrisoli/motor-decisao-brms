@@ -119,4 +119,16 @@ public class EngineOrchestrationService {
             log.error("Erro ao tentar processar JSON de saída: ", ex);
         }
     }
+
+    public EngineEvaluation findById(String id) {
+        return engineEvaluationRepository
+            .findById(id)
+            .orElseThrow(() -> new ValidacaoException("Não foi encontrada uma avaliação para este ID."));
+    }
+
+    public EngineEvaluation findByEvaluationId(String evaluationId) {
+        return engineEvaluationRepository
+            .findByEngineId(evaluationId)
+            .orElseThrow(() -> new ValidacaoException("Não foi encontrada uma avaliação para este ID."));
+    }
 }
