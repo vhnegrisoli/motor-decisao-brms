@@ -21,6 +21,85 @@ um sistema para implementar, gerenciar e executar regras de negócio de maneira 
 
 ![Workflow](https://github.com/vhnegrisoli/motor-decisao-brms/blob/master/Decision%20Engine%20Worflow.png)
 
+### Possibilidade de habilitar/desabilitar regras por produtos
+
+Na classe **RuleDefinition** (br.com.decisao.motordecisao.config.rule.RuleDefinition) é possível
+adicionar uma regra para um produto definindo se está habilitada ou desabilitada no método **getRules()**.
+
+```java
+public static List<RuleExecution> getRules() {
+    return List.of(
+        define(ALUGUEL, REGRA_AVALIAR_CPF_VALIDO, HABILITADA),
+        define(COMPRA, REGRA_AVALIAR_CPF_VALIDO, HABILITADA),
+        define(ALUGUEL, REGRA_AVALIAR_CPF_LIMPO, HABILITADA),
+        define(ALUGUEL, REGRA_AVALIAR_IDADE_PERMITIDA, HABILITADA)
+    );
+}
+```
+
+Para criar uma nova regra, adicione um novo ID para ela no enum **RuleId** e adicione na lista acima.
+
+### Orquestração das regras
+
+A orquestração fica na classe **EngineOrchestrationService** no método **evaluateRules**, como pode ser visto abaixo:
+
+```java
+
+private void evaluateRules(PayloadProduct payloadProduto) {
+        var keepRunning = true;
+        var rules = payloadProduto.getProduto().getRegras();
+        if (shouldEvaluate(keepRunning, RuleId.REGRA_AVALIAR_CPF_VALIDO, rules, payloadProduto)) {
+            keepRunning = executeAndDefineNext(RuleId.REGRA_AVALIAR_CPF_VALIDO, payloadProduto);
+        }
+        if (shouldEvaluate(keepRunning, RuleId.REGRA_AVALIAR_CPF_LIMPO, rules, payloadProduto)) {
+            keepRunning = executeAndDefineNext(RuleId.REGRA_AVALIAR_CPF_LIMPO, payloadProduto);
+        }
+        if (shouldEvaluate(keepRunning, RuleId.REGRA_AVALIAR_IDADE_PERMITIDA, rules, payloadProduto)) {
+            keepRunning = executeAndDefineNext(RuleId.REGRA_AVALIAR_IDADE_PERMITIDA, payloadProduto);
+        }
+   }
+```
+
+Ao criar uma nova regra (anotar com **@Component** cada classe de regra), é necessário incluir 
+na service responsável por gerir a execução das regras, em **RuleExecutorService**, na seguinte estrutura:
+
+
+Obs.: no momento apenas uma regra foi desenvolvida, para verificar se o CPF do cliente é válido:
+
+```java
+@Service
+public class RuleExecutorService {
+
+    @Autowired
+    private RegraCpfValido regraCpfValido;
+
+    public Rule executeRule(RuleId ruleId,
+                            PayloadProduct payloadProduct) {
+        switch (ruleId) {
+            case REGRA_AVALIAR_CPF_VALIDO:
+                return regraCpfValido.avaliarRegra(payloadProduct);
+            case REGRA_AVALIAR_CPF_LIMPO:
+            case REGRA_AVALIAR_IDADE_PERMITIDA:
+            default:
+                return new Rule();
+        }
+    }
+}
+```
+
+São 4 condições para avaliar uma regra:
+
+1 - É necessário que a variável booleana **keepRunning** seja **true**.
+2 - É necessário que o ID da regra a ser avaliada esteja disponível para o produto da iteração atual
+3 - É necessário que o ID da regra a ser avaliada esteja habilitada para o produto da iteração atual
+4 - É necessário que o ID da regra a ser avaliada para o produto da iteração atual não exista na lista de regras do produto, caso contrário,
+entende-se que ela já foi avaliada.
+
+Após a avaliação da regra, é chamado o método **rule.isApproved()**, que apenas 
+retorna um valor booleano caso o status da regra que foi avaliada está como APROVADA, e esse
+valor booleano é definido à variável keepRunning. Ou seja, se uma regra reprova, a variável
+keepRunning fica false, e para toda a execução das próximas regras.
+
 ### Descrição dos dados da tomada de decisão
 
 As regras de negócios possuem **IDs**, **descrições** e **status**, e cada produto avaliado possui uma lista de regras avaliadas.
