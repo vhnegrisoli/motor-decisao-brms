@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static br.com.decisao.motordecisao.config.rule.RuleId.*;
+
 @Slf4j
 @Service
 public class EngineOrchestrationService {
@@ -62,14 +64,14 @@ public class EngineOrchestrationService {
     private void evaluateRules(PayloadProduct payloadProduto) {
         var keepRunning = true;
         var rules = payloadProduto.getProduto().getRegras();
-        if (shouldEvaluate(keepRunning, RuleId.REGRA_AVALIAR_CPF_VALIDO, rules, payloadProduto)) {
-            keepRunning = executeAndDefineNext(RuleId.REGRA_AVALIAR_CPF_VALIDO, payloadProduto);
+        if (shouldEvaluate(keepRunning, REGRA_AVALIAR_CPF_VALIDO, rules, payloadProduto)) {
+            keepRunning = executeAndDefineNext(REGRA_AVALIAR_CPF_VALIDO, payloadProduto);
         }
-        if (shouldEvaluate(keepRunning, RuleId.REGRA_AVALIAR_CPF_LIMPO, rules, payloadProduto)) {
-            keepRunning = executeAndDefineNext(RuleId.REGRA_AVALIAR_CPF_LIMPO, payloadProduto);
+        if (shouldEvaluate(keepRunning, REGRA_AVALIAR_CPF_LIMPO, rules, payloadProduto)) {
+            keepRunning = executeAndDefineNext(REGRA_AVALIAR_CPF_LIMPO, payloadProduto);
         }
-        if (shouldEvaluate(keepRunning, RuleId.REGRA_AVALIAR_IDADE_PERMITIDA, rules, payloadProduto)) {
-            keepRunning = executeAndDefineNext(RuleId.REGRA_AVALIAR_IDADE_PERMITIDA, payloadProduto);
+        if (shouldEvaluate(keepRunning, REGRA_AVALIAR_IDADE_PERMITIDA, rules, payloadProduto)) {
+            keepRunning = executeAndDefineNext(REGRA_AVALIAR_IDADE_PERMITIDA, payloadProduto);
         }
     }
 

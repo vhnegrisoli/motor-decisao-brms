@@ -44,20 +44,19 @@ Para criar uma nova regra, adicione um novo ID para ela no enum **RuleId** e adi
 A orquestração fica na classe **EngineOrchestrationService** no método **evaluateRules**, como pode ser visto abaixo:
 
 ```java
-
 private void evaluateRules(PayloadProduct payloadProduto) {
-        var keepRunning = true;
-        var rules = payloadProduto.getProduto().getRegras();
-        if (shouldEvaluate(keepRunning, RuleId.REGRA_AVALIAR_CPF_VALIDO, rules, payloadProduto)) {
-            keepRunning = executeAndDefineNext(RuleId.REGRA_AVALIAR_CPF_VALIDO, payloadProduto);
-        }
-        if (shouldEvaluate(keepRunning, RuleId.REGRA_AVALIAR_CPF_LIMPO, rules, payloadProduto)) {
-            keepRunning = executeAndDefineNext(RuleId.REGRA_AVALIAR_CPF_LIMPO, payloadProduto);
-        }
-        if (shouldEvaluate(keepRunning, RuleId.REGRA_AVALIAR_IDADE_PERMITIDA, rules, payloadProduto)) {
-            keepRunning = executeAndDefineNext(RuleId.REGRA_AVALIAR_IDADE_PERMITIDA, payloadProduto);
-        }
-   }
+    var keepRunning = true;
+    var rules = payloadProduto.getProduto().getRegras();
+    if (shouldEvaluate(keepRunning, REGRA_AVALIAR_CPF_VALIDO, rules, payloadProduto)) {
+        keepRunning = executeAndDefineNext(REGRA_AVALIAR_CPF_VALIDO, payloadProduto);
+    }
+    if (shouldEvaluate(keepRunning, REGRA_AVALIAR_CPF_LIMPO, rules, payloadProduto)) {
+        keepRunning = executeAndDefineNext(REGRA_AVALIAR_CPF_LIMPO, payloadProduto);
+    }
+    if (shouldEvaluate(keepRunning, REGRA_AVALIAR_IDADE_PERMITIDA, rules, payloadProduto)) {
+        keepRunning = executeAndDefineNext(REGRA_AVALIAR_IDADE_PERMITIDA, payloadProduto);
+    }
+}
 ```
 
 Ao criar uma nova regra (anotar com **@Component** cada classe de regra), é necessário incluir 
