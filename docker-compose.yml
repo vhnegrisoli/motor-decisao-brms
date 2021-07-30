@@ -1,0 +1,31 @@
+version: '3'
+services:
+
+  motor-decisao-db:
+    image: tutum/mongodb
+    container_name: motor-decisao-db
+    restart: always
+    networks:
+      - motor-decisao
+    environment:
+      - AUTH=no
+    ports:
+      - '27017:27017'
+      - '28017:28017'
+
+  motor-decisao-api:
+    build: './'
+    container_name: motor-decisao-api
+    ports:
+      - 8080:8080
+    networks:
+      - motor-decisao
+    depends_on:
+      - motor-decisao-db
+    environment:
+      - MONGO_DB_HOST=motor-decisao-db
+      - MONGO_DB_PORT=27017
+      - MONGO_DB_COLLECTION=decision-engine
+
+networks:
+  motor-decisao:
