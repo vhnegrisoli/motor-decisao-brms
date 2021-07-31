@@ -1,6 +1,7 @@
 package br.com.decisao.motordecisao.modules.engine.service;
 
 import br.com.decisao.motordecisao.config.LogDataService;
+import br.com.decisao.motordecisao.config.TransactionData;
 import br.com.decisao.motordecisao.config.exception.ValidacaoException;
 import br.com.decisao.motordecisao.config.rule.RuleDefinition;
 import br.com.decisao.motordecisao.config.rule.RuleId;
@@ -53,10 +54,11 @@ public class EngineOrchestrationService {
             logData(response, SAIDA);
             return response;
         } catch (Exception ex) {
-            throw new ValidacaoException(
-                "Erro ao tentar processar os dados no motor de decisão: "
-                    .concat(ex.getMessage())
-            );
+            var transaction = TransactionData.getTransactionData();
+            log.error("Erro ao tentar processar avaliação do motor. TransactionId: {}, ServiceId: {}.",
+                transaction.getTransactionId(), transaction.getServiceId(), ex);
+            throw new ValidacaoException("Erro ao tentar processar os dados no motor de decisão: "
+                    .concat(ex.getMessage()));
         }
     }
 
