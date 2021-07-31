@@ -15,6 +15,8 @@ um sistema para implementar, gerenciar e executar regras de negócio de maneira 
 * API REST
 * MongoDB
 * Docker
+* JUnit 5
+* AssertJ
 * Swagger
 
 ### Workflow de decisão
@@ -366,6 +368,15 @@ A documentação localiza-se em:
 http://localhost:8080/swagger-ui.html
 
 Porém, apenas ao acessar a URL base da API (http://localhost:8080) você já será redirecionado à documentação.
+
+### Testes unitários
+
+O projeto conta com testes unitários para cada arquivo Java que contém métodos que executam e processam algo,
+seja uma função void ou uma função que retorne um valor.
+
+Os testes podem ser executados com:
+
+`gradle build` ou apenas `gradle test`.
 
 ### Autor
 
