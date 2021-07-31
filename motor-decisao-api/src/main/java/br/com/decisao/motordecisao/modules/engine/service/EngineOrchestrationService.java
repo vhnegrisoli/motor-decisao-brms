@@ -1,5 +1,6 @@
 package br.com.decisao.motordecisao.modules.engine.service;
 
+import br.com.decisao.motordecisao.config.LogDataService;
 import br.com.decisao.motordecisao.config.exception.ValidacaoException;
 import br.com.decisao.motordecisao.config.rule.RuleDefinition;
 import br.com.decisao.motordecisao.config.rule.RuleId;
@@ -24,6 +25,9 @@ import static br.com.decisao.motordecisao.config.rule.RuleId.*;
 @Service
 public class EngineOrchestrationService {
 
+    private static final String ENTRADA = "Entrada";
+    private static final String SAIDA = "Saída";
+
     @Autowired
     private RuleExecutorService ruleExecutorService;
 
@@ -36,14 +40,17 @@ public class EngineOrchestrationService {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private LogDataService logDataService;
+
     public EngineEvaluation runEngine(PayloadRequest payload) {
         try {
-            logRequest(payload);
+            logData(payload, ENTRADA);
             var startTime = LocalDateTime.now();
             runProcess(payload);
             var engineEvaluation = EngineEvaluation.convertFrom(payload, startTime);
             var response = engineEvaluationRepository.save(engineEvaluation);
-            logResponse(response);
+            logData(response, SAIDA);
             return response;
         } catch (Exception ex) {
             throw new ValidacaoException(
@@ -104,24 +111,6 @@ public class EngineOrchestrationService {
             && !Rule.isAlreadyEvaluatedRule(ruleId, rules);
     }
 
-    private void logRequest(PayloadRequest payload) {
-        try {
-            log.info("Início da chamada ao endpoint de rodar o moto com payload: {}",
-                objectMapper.writeValueAsString(payload));
-        } catch (Exception ex) {
-            log.error("Erro ao tentar processar JSON de entrada: ", ex);
-        }
-    }
-
-    private void logResponse(EngineEvaluation engineEvaluation) {
-        try {
-            log.info("Payload de resposta da chamada ao endpoint de rodar o moto: {}",
-                objectMapper.writeValueAsString(engineEvaluation));
-        } catch (Exception ex) {
-            log.error("Erro ao tentar processar JSON de saída: ", ex);
-        }
-    }
-
     public EngineEvaluation findById(String id) {
         return engineEvaluationRepository
             .findById(id)
@@ -132,5 +121,18 @@ public class EngineOrchestrationService {
         return engineEvaluationRepository
             .findByEngineId(evaluationId)
             .orElseThrow(() -> new ValidacaoException("Não foi encontrada uma avaliação para este ID."));
+    }
+
+    private void logData(Object payload,
+                         String step) {
+        try {
+            var payloadStr = objectMapper.writeValueAsString(payload);
+            logDataService.logData(
+                String.format("%s do endpoint de rodar o moto com transactionId {}, seriviceId: {} e dados: {}", step),
+                payloadStr
+            );
+        } catch (Exception ex) {
+            log.error("Erro ao tentar processar JSON de entrada: ", ex);
+        }
     }
 }

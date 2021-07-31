@@ -14,17 +14,20 @@ public class EngineController {
     private EngineOrchestrationService engineService;
 
     @PostMapping("run")
-    public EngineEvaluation runEngine(@RequestBody PayloadRequest body) {
+    public EngineEvaluation runEngine(@RequestBody PayloadRequest body,
+                                      @RequestHeader String transactionId) {
         return engineService.runEngine(body);
     }
 
     @GetMapping("{id}")
-    public EngineEvaluation findById(@PathVariable String id) {
+    public EngineEvaluation findById(@PathVariable String id,
+                                     @RequestHeader String transactionId) {
         return engineService.findById(id);
     }
 
     @GetMapping("engine-evaluation/{evaluationId}")
-    public EngineEvaluation findByEvaluationId(@PathVariable String evaluationId) {
+    public EngineEvaluation findByEvaluationId(@PathVariable String evaluationId,
+                                               @RequestHeader String transactionId) {
         return engineService.findByEvaluationId(evaluationId);
     }
 }

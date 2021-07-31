@@ -14,7 +14,7 @@ services:
       - '28017:28017'
 
   motor-decisao-api:
-    build: './'
+    build: './motor-decisao-api'
     container_name: motor-decisao-api
     ports:
       - 8080:8080
