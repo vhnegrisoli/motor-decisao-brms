@@ -3,10 +3,11 @@ package br.com.decisao.motordecisao.modules.data.dto;
 import br.com.decisao.motordecisao.modules.data.enums.ProductId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,8 @@ public class EngineProduct {
 
     @JsonIgnore
     public boolean isDisapprovedProduct() {
-        return regras
+        return !ObjectUtils.isEmpty(regras) &&
+            regras
             .stream()
             .anyMatch(Rule::isDisapproved);
     }

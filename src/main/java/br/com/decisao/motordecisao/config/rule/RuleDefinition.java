@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.List;
 
+import static br.com.decisao.motordecisao.config.rule.RuleAvailability.DESABILITADA;
 import static br.com.decisao.motordecisao.config.rule.RuleAvailability.HABILITADA;
 import static br.com.decisao.motordecisao.config.rule.RuleExecution.define;
 import static br.com.decisao.motordecisao.config.rule.RuleId.*;
@@ -20,7 +21,7 @@ public class RuleDefinition {
         return List.of(
             define(ALUGUEL, REGRA_AVALIAR_CPF_VALIDO, HABILITADA),
             define(COMPRA, REGRA_AVALIAR_CPF_VALIDO, HABILITADA),
-            define(ALUGUEL, REGRA_AVALIAR_CPF_LIMPO, HABILITADA),
+            define(ALUGUEL, REGRA_AVALIAR_CPF_LIMPO, DESABILITADA),
             define(ALUGUEL, REGRA_AVALIAR_IDADE_PERMITIDA, HABILITADA)
         );
     }
