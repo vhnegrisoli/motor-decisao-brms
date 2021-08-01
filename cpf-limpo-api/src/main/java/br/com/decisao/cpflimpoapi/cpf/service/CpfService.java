@@ -9,6 +9,7 @@ import br.com.decisao.cpflimpoapi.cpf.repository.CpfLimpoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 @Slf4j
 @Service
@@ -19,18 +20,20 @@ public class CpfService {
 
     public CpfValidoResponse verificarCpfValido(String cpf) {
         try {
+            cpf = formatarCpf(cpf);
             new CPFValidator().assertValid(cpf);
             return new CpfValidoResponse(cpf, true);
         } catch (Exception ex) {
             var transaction = TransactionData.getTransactionData();
             log.error("O CPF {} está inválido. TransactionId: {}, ServiceId: {}.",
-                transaction.getTransactionId(), transaction.getServiceId(), ex);
+                cpf, transaction.getTransactionId(), transaction.getServiceId(), ex);
             return new CpfValidoResponse(cpf, false);
         }
     }
 
     public CpfLimpoResponse verificarCpfLimpo(String cpf) {
         try {
+            cpf = formatarCpf(cpf);
             return CpfLimpoResponse.converterDe(cpfLimpoRepository
                 .findByCpf(cpf)
                 .orElseThrow(() -> new ValidacaoException("O CPF não foi encontrado.")));
@@ -40,5 +43,13 @@ public class CpfService {
                 cpf, transaction.getTransactionId(), transaction.getServiceId(), ex);
             throw ex;
         }
+    }
+
+    private String formatarCpf(String cpf) {
+        if (!ObjectUtils.isEmpty(cpf)) {
+            cpf = cpf.replaceAll("\\.", "");
+            cpf = cpf.replace("-", "");
+        }
+        return cpf;
     }
 }

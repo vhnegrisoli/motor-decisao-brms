@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 @Component
-public class TransactionInterceptor implements HandlerInterceptor {
+public class RequestTransactionInterceptor implements HandlerInterceptor {
 
     private static final String OPTIONS_METHOD = "OPTIONS";
     private static final String TRANSACTION_ID = "transactionId";

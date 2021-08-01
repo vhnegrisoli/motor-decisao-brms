@@ -9,12 +9,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class InterceptorConfig implements WebMvcConfigurer {
 
     @Bean
-    public TransactionInterceptor transactionInterceptor() {
-        return new TransactionInterceptor();
+    public RequestTransactionInterceptor requestTransactionInterceptor() {
+        return new RequestTransactionInterceptor();
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(transactionInterceptor());
+        registry.addInterceptor(requestTransactionInterceptor());
     }
 }
