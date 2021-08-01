@@ -1,4 +1,4 @@
-package br.com.decisao.motordecisao.config.exception;
+package br.com.decisao.cpflimpoapi.config.exception;
 
 import lombok.Data;
 

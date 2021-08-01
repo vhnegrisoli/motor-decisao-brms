@@ -1,6 +1,6 @@
-package br.com.decisao.motordecisao.config.exception;
+package br.com.decisao.cpflimpoapi.config.exception;
 
-import br.com.decisao.motordecisao.config.TransactionData;
+import br.com.decisao.cpflimpoapi.config.TransactionData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,7 +11,7 @@ public class ValidacaoExceptionHandler {
 
     @ExceptionHandler(ValidacaoException.class)
     public ResponseEntity<?> handleResouseNotFoundException(ValidacaoException rfnException) {
-        var resourceNotFoundDetails = new ExceptionDetails();
+        ExceptionDetails resourceNotFoundDetails = new ExceptionDetails();
         var transactionData = TransactionData.getTransactionData();
         resourceNotFoundDetails.setStatus(HttpStatus.BAD_REQUEST.value());
         resourceNotFoundDetails.setMessage(rfnException.getMessage());

@@ -114,15 +114,30 @@ public class EngineOrchestrationService {
     }
 
     public EngineEvaluation findById(String id) {
-        return engineEvaluationRepository
-            .findById(id)
-            .orElseThrow(() -> new ValidacaoException("Não foi encontrada uma avaliação para este ID."));
+        try {
+            return engineEvaluationRepository
+                .findById(id)
+                .orElseThrow(() -> new ValidacaoException("Não foi encontrada uma avaliação para este ID."));
+        } catch (Exception ex) {
+            var transaction = TransactionData.getTransactionData();
+            log.error("Não foi encontrada uma avaliação do motor pelo ID {}. TransactionId: {}, ServiceId: {}.",
+                id, transaction.getTransactionId(), transaction.getServiceId(), ex);
+            throw ex;
+        }
     }
 
     public EngineEvaluation findByEvaluationId(String evaluationId) {
-        return engineEvaluationRepository
-            .findByEngineId(evaluationId)
-            .orElseThrow(() -> new ValidacaoException("Não foi encontrada uma avaliação para este ID."));
+        try {
+            return engineEvaluationRepository
+                .findByEngineId(evaluationId)
+                .orElseThrow(() -> new ValidacaoException("Não foi encontrada uma avaliação para este ID."));
+        } catch (Exception ex) {
+            var transaction = TransactionData.getTransactionData();
+            log.error(
+                "Não foi encontrada um ID  de avaliação pelo ID {}. TransactionId: {}, ServiceId: {}.",
+                evaluationId, transaction.getTransactionId(), transaction.getServiceId());
+            throw ex;
+        }
     }
 
     private void logData(Object payload,
@@ -130,11 +145,13 @@ public class EngineOrchestrationService {
         try {
             var payloadStr = objectMapper.writeValueAsString(payload);
             logDataService.logData(
-                String.format("%s do endpoint de rodar o moto com transactionId {}, seriviceId: {} e dados: {}", step),
+                String.format("TransactionId: {}, ServiceId: {}. %s do endpoint de rodar o moto com dados: {}.", step),
                 payloadStr
             );
         } catch (Exception ex) {
-            log.error("Erro ao tentar processar JSON de entrada: ", ex);
+            var transaction = TransactionData.getTransactionData();
+            log.error("TransactionId: {}, ServiceId: {}. Erro ao tentar processar JSON de entrada: ",
+                transaction.getTransactionId(), transaction.getServiceId(), ex);
         }
     }
 }
