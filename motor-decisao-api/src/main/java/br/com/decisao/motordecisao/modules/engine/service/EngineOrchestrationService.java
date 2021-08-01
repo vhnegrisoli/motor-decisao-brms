@@ -3,7 +3,7 @@ package br.com.decisao.motordecisao.modules.engine.service;
 import br.com.decisao.motordecisao.config.LogDataService;
 import br.com.decisao.motordecisao.config.TransactionData;
 import br.com.decisao.motordecisao.config.exception.ValidacaoException;
-import br.com.decisao.motordecisao.config.rule.RuleDefinition;
+import br.com.decisao.motordecisao.config.rule.AvailableRules;
 import br.com.decisao.motordecisao.config.rule.RuleId;
 import br.com.decisao.motordecisao.modules.data.dto.PayloadProduct;
 import br.com.decisao.motordecisao.modules.data.dto.PayloadRequest;
@@ -109,7 +109,7 @@ public class EngineOrchestrationService {
                                    List<Rule> rules,
                                    PayloadProduct payloadProduto) {
         return keepRunning
-            && RuleDefinition.isRuleAvailable(ruleId, payloadProduto.getProduto().getId())
+            && AvailableRules.isRuleAvailable(ruleId, payloadProduto.getProduto().getId())
             && !Rule.isAlreadyEvaluatedRule(ruleId, rules);
     }
 
