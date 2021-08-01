@@ -18,6 +18,10 @@ um sistema para implementar, gerenciar e executar regras de negócio de maneira 
 * JUnit 5
 * AssertJ
 * Swagger
+* Spring Cloud OpenFeign (API de validação de CEP - ViaCep)
+* Spring Data JPA
+* Spring Data
+* RestTemplate (chamadas REST entre microsserviços)
 
 ### Workflow de decisão
 
