@@ -22,6 +22,8 @@ um sistema para implementar, gerenciar e executar regras de negócio de maneira 
 * Spring Data JPA
 * Spring Data
 * RestTemplate (chamadas REST entre microsserviços)
+* RabbitMQ
+* PostgreSQL
 
 ### Workflow de decisão
 
