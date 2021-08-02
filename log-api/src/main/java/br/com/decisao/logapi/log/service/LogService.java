@@ -1,6 +1,7 @@
 package br.com.decisao.logapi.log.service;
 
 import br.com.decisao.logapi.log.dto.LogFilter;
+import br.com.decisao.logapi.log.predicate.LogPredicate;
 import br.com.decisao.logapi.log.repository.LogRepository;
 import br.com.decisao.logapi.log.document.Log;
 import lombok.extern.slf4j.Slf4j;
@@ -27,24 +28,11 @@ public class LogService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
+    private LogPredicate logPredicate;
+
     public List<Log> findAll(LogFilter logFilter) {
-        var criteria = new Query();
-        if (!isEmpty(logFilter.getTransactionId())) {
-            criteria = criteria.addCriteria(Criteria.where("transactionId").is(logFilter.getTransactionId()));
-        }
-        if (!isEmpty(logFilter.getServiceId())) {
-            criteria = criteria.addCriteria(Criteria.where("serviceId").is(logFilter.getServiceId()));
-        }
-        if (!isEmpty(logFilter.getLogLevel())) {
-            criteria = criteria.addCriteria(Criteria.where("logLevel").is(logFilter.getLogLevel()));
-        }
-        if (!isEmpty(logFilter.getServiceName())) {
-            criteria = criteria.addCriteria(Criteria.where("serviceName").is(logFilter.getServiceName()));
-        }
-        if (!isEmpty(logFilter.getMessage())) {
-            criteria = criteria.addCriteria(Criteria.where("message").regex(format(".*%s.*", logFilter.getMessage()), "i"));
-        }
-        return mongoTemplate.find(criteria, Log.class);
+        return mongoTemplate.find(logPredicate.definePredicate(logFilter), Log.class);
     }
 
     public void saveLog(Log logResponse) {
