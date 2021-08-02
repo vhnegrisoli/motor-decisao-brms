@@ -13,7 +13,7 @@ public class DtoMocks {
     public static ConsultedApiService getOneConsultedApiService() {
         return ConsultedApiService
             .builder()
-            .id(Api.CPF)
+            .id(Api.CPF_VALIDO)
             .razao(null)
             .status(200)
             .sucesso(true)
@@ -43,7 +43,7 @@ public class DtoMocks {
     public static Rule getPendingApiServiceRule() {
         return Rule
             .builder()
-            .apiPendente(Api.CPF)
+            .apiPendente(Api.CPF_VALIDO)
             .id(RuleId.REGRA_AVALIAR_CPF_VALIDO)
             .descricao("teste")
             .status(RuleStatus.API_PENDENTE)

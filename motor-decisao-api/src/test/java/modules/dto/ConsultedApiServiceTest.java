@@ -19,7 +19,7 @@ public class ConsultedApiServiceTest {
 
         var expectedApiService = getOneConsultedApiService();
 
-        assertThat(ConsultedApiService.getConsultedApiService(Api.CPF,givenApiServiceList))
+        assertThat(ConsultedApiService.getConsultedApiService(Api.CPF_VALIDO,givenApiServiceList))
             .usingRecursiveComparison()
             .isEqualTo(expectedApiService);
     }
@@ -43,7 +43,7 @@ public class ConsultedApiServiceTest {
     @Test
     @DisplayName("Should return null when informing a null consulted API service list")
     public void shouldReturnNullWhenInformingNullApiServiceList() {
-        assertThat(ConsultedApiService.getConsultedApiService(Api.CPF, null)).isNull();
+        assertThat(ConsultedApiService.getConsultedApiService(Api.CPF_VALIDO, null)).isNull();
     }
 
     @Test
@@ -57,7 +57,7 @@ public class ConsultedApiServiceTest {
     public void shouldCreateAConsultedApiServiceWhenInformingData() {
         var expectedApiService = getOneConsultedApiService();
 
-        assertThat(ConsultedApiService.create(Api.CPF, true, 200, null))
+        assertThat(ConsultedApiService.create(Api.CPF_VALIDO, true, 200, null))
             .usingRecursiveComparison()
             .isEqualTo(expectedApiService);
     }

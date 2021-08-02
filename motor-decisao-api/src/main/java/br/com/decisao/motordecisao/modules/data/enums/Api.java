@@ -1,6 +1,7 @@
 package br.com.decisao.motordecisao.modules.data.enums;
 
 public enum Api {
-    CPF,
+    CPF_VALIDO,
+    CPF_LIMPO,
     CEP
 }

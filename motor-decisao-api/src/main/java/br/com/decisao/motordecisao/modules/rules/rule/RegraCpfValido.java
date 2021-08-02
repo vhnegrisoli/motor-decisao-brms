@@ -6,7 +6,7 @@ import br.com.decisao.motordecisao.modules.data.dto.Rule;
 import org.springframework.stereotype.Component;
 
 import static br.com.decisao.motordecisao.config.rule.RuleId.REGRA_AVALIAR_CPF_VALIDO;
-import static br.com.decisao.motordecisao.modules.data.enums.Api.CPF;
+import static br.com.decisao.motordecisao.modules.data.enums.Api.CPF_VALIDO;
 import static br.com.decisao.motordecisao.modules.data.enums.RuleStatus.APROVADA;
 import static br.com.decisao.motordecisao.modules.data.enums.RuleStatus.REPROVADA;
 import static org.springframework.util.ObjectUtils.isEmpty;
@@ -16,7 +16,7 @@ public class RegraCpfValido {
 
     public Rule avaliarRegra(PayloadProduct payloadProduct) {
         var cpf = payloadProduct.getPayload().getPessoa().getCpf();
-        var apiConsultada = ConsultedApiService.getConsultedApiService(CPF, payloadProduct.getPayload().getApisConsultadas());
+        var apiConsultada = ConsultedApiService.getConsultedApiService(CPF_VALIDO, payloadProduct.getPayload().getApisConsultadas());
         var dadosCpf = payloadProduct.getPayload().getDadosApis().getCpfService();
 
         if (isEmpty(cpf)) {
@@ -24,7 +24,7 @@ public class RegraCpfValido {
         }
 
         if (isEmpty(apiConsultada)) {
-            return Rule.createRuleWithPendingService(CPF, REGRA_AVALIAR_CPF_VALIDO, "O serviço de CPF ainda não foi consultado.");
+            return Rule.createRuleWithPendingService(CPF_VALIDO, REGRA_AVALIAR_CPF_VALIDO, "O serviço de CPF ainda não foi consultado.");
         }
 
         if (!apiConsultada.isSucesso()) {

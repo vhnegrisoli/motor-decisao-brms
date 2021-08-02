@@ -29,3 +29,19 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQL9Dialect
         jdbc:
           lob.non_contextual_creation: true
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+rabbit:
+  exchange:
+    log-data: log-data.topic
+
+  routingkey:
+    log-data: log-data.routingkey
+
+  queue:
+    log-data: log-data.queue

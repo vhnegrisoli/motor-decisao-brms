@@ -1,10 +1,11 @@
 package br.com.decisao.motordecisao.modules.engine.service;
 
-import br.com.decisao.motordecisao.config.LogDataService;
+import br.com.decisao.motordecisao.config.JsonUtil;
 import br.com.decisao.motordecisao.config.TransactionData;
 import br.com.decisao.motordecisao.config.exception.ValidacaoException;
 import br.com.decisao.motordecisao.config.rule.AvailableRules;
 import br.com.decisao.motordecisao.config.rule.RuleId;
+import br.com.decisao.motordecisao.log.service.LogService;
 import br.com.decisao.motordecisao.modules.data.dto.PayloadProduct;
 import br.com.decisao.motordecisao.modules.data.dto.PayloadRequest;
 import br.com.decisao.motordecisao.modules.data.dto.Rule;
@@ -12,7 +13,6 @@ import br.com.decisao.motordecisao.modules.engine.document.EngineEvaluation;
 import br.com.decisao.motordecisao.modules.engine.repository.EngineEvaluationRepository;
 import br.com.decisao.motordecisao.modules.restservices.service.RestCallService;
 import br.com.decisao.motordecisao.modules.rules.service.RuleExecutorService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,13 +21,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static br.com.decisao.motordecisao.config.rule.RuleId.*;
+import static java.lang.String.format;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 
 @Slf4j
 @Service
 public class EngineOrchestrationService {
-
-    private static final String ENTRADA = "Entrada";
-    private static final String SAIDA = "Saída";
 
     @Autowired
     private RuleExecutorService ruleExecutorService;
@@ -39,26 +39,27 @@ public class EngineOrchestrationService {
     private EngineEvaluationRepository engineEvaluationRepository;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JsonUtil jsonUtil;
 
     @Autowired
-    private LogDataService logDataService;
+    private LogService logService;
 
     public EngineEvaluation runEngine(PayloadRequest payload) {
+        var transaction = TransactionData.getTransactionData();
         try {
-            logData(payload, ENTRADA);
+            logService.logData(format("Chamando endpoint de avaliação ao motor com dados: %s. TransactionId: %s. ServiceId: %s.",
+                jsonUtil.toJson(payload), transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
             var startTime = LocalDateTime.now();
             runProcess(payload);
             var engineEvaluation = EngineEvaluation.convertFrom(payload, startTime);
             var response = engineEvaluationRepository.save(engineEvaluation);
-            logData(response, SAIDA);
+            logService.logData(format("Resposta da avaliação ao motor com dados: %s. TransactionId: %s. ServiceId: %s.",
+                jsonUtil.toJson(response), transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
             return response;
         } catch (Exception ex) {
-            var transaction = TransactionData.getTransactionData();
-            log.error("Erro ao tentar processar avaliação do motor. TransactionId: {}, ServiceId: {}.",
-                transaction.getTransactionId(), transaction.getServiceId(), ex);
-            throw new ValidacaoException("Erro ao tentar processar os dados no motor de decisão: "
-                    .concat(ex.getMessage()));
+            logService.logData(format("Erro ao tentar processar avaliação do motor. TransactionId: %s, ServiceId: %s.",
+                transaction.getTransactionId(), transaction.getServiceId()), ERROR, ex);
+            throw new ValidacaoException(format("Erro ao tentar processar os dados no motor de decisão: %s", ex.getMessage()));
         }
     }
 
@@ -114,44 +115,46 @@ public class EngineOrchestrationService {
     }
 
     public EngineEvaluation findById(String id) {
+        var transaction = TransactionData.getTransactionData();
         try {
-            return engineEvaluationRepository
-                .findById(id)
-                .orElseThrow(() -> new ValidacaoException("Não foi encontrada uma avaliação para este ID."));
+            logService.logData(format("Iniciando consulta de avaliação por ID %s. TransactionId: %s, ServiceId: %s.",
+                id, transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
+            var response = findByMongoId(id);
+            logService.logData(format("Resposta da consulta de avaliação por ID %s: %s. TransactionId: %s, ServiceId: %s.",
+                id, jsonUtil.toJson(response), transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
+            return response;
         } catch (Exception ex) {
-            var transaction = TransactionData.getTransactionData();
-            log.error("Não foi encontrada uma avaliação do motor pelo ID {}. TransactionId: {}, ServiceId: {}.",
-                id, transaction.getTransactionId(), transaction.getServiceId(), ex);
+            logService.logData(format("Não foi encontrada uma avaliação pelo ID %s. TransactionId: %s, ServiceId: %s.",
+                id, transaction.getTransactionId(), transaction.getServiceId()), ERROR, ex);
             throw ex;
         }
     }
 
     public EngineEvaluation findByEvaluationId(String evaluationId) {
+        var transaction = TransactionData.getTransactionData();
         try {
-            return engineEvaluationRepository
-                .findByEngineId(evaluationId)
-                .orElseThrow(() -> new ValidacaoException("Não foi encontrada uma avaliação para este ID."));
+            logService.logData(format("Iniciando consulta de avaliação por ID do motor: %s. TransactionId: %s, ServiceId: %s.",
+                evaluationId, transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
+            var response = findByEngineId(evaluationId);
+            logService.logData(format("Resposta da consulta de avaliação por ID do motor %s: %s. TransactionId: %s, ServiceId: %s.",
+                evaluationId, jsonUtil.toJson(response), transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
+            return response;
         } catch (Exception ex) {
-            var transaction = TransactionData.getTransactionData();
-            log.error(
-                "Não foi encontrada um ID  de avaliação pelo ID {}. TransactionId: {}, ServiceId: {}.",
-                evaluationId, transaction.getTransactionId(), transaction.getServiceId());
+            logService.logData(format("Não foi encontrada um ID de avaliação pelo ID %s. TransactionId: %s, ServiceId: %s.",
+                evaluationId, transaction.getTransactionId(), transaction.getServiceId()), ERROR, ex);
             throw ex;
         }
     }
 
-    private void logData(Object payload,
-                         String step) {
-        try {
-            var payloadStr = objectMapper.writeValueAsString(payload);
-            logDataService.logData(
-                String.format("TransactionId: {}, ServiceId: {}. %s do endpoint de rodar o moto com dados: {}.", step),
-                payloadStr
-            );
-        } catch (Exception ex) {
-            var transaction = TransactionData.getTransactionData();
-            log.error("TransactionId: {}, ServiceId: {}. Erro ao tentar processar JSON de entrada: ",
-                transaction.getTransactionId(), transaction.getServiceId(), ex);
-        }
+    private EngineEvaluation findByMongoId(String id) {
+        return engineEvaluationRepository
+            .findById(id)
+            .orElseThrow(() -> new ValidacaoException("Não foi encontrada uma avaliação para este ID."));
+    }
+
+    private EngineEvaluation findByEngineId(String id) {
+        return engineEvaluationRepository
+            .findByEngineId(id)
+            .orElseThrow(() -> new ValidacaoException("Não foi encontrada uma avaliação para este ID."));
     }
 }
