@@ -28,6 +28,12 @@ app-config:
       valid: ${app-config.services.cpf.uri}%s/valido
       clean: ${app-config.services.cpf.uri}%s/limpo
 
+    cep:
+      uri: http://localhost:8082/api/v1/cep/%s
+
+    idade:
+      uri: http://localhost:8083/api/v1/idade/%s
+
 rabbit:
   exchange:
     log-data: log-data.topic

@@ -1,7 +1,6 @@
 package br.com.decisao.motordecisao.modules.engine.service;
 
 import br.com.decisao.motordecisao.config.JsonUtil;
-import br.com.decisao.motordecisao.config.TransactionData;
 import br.com.decisao.motordecisao.config.exception.ValidacaoException;
 import br.com.decisao.motordecisao.config.rule.AvailableRules;
 import br.com.decisao.motordecisao.config.rule.RuleId;
@@ -22,8 +21,6 @@ import java.util.List;
 
 import static br.com.decisao.motordecisao.config.rule.RuleId.*;
 import static java.lang.String.format;
-import static java.lang.System.Logger.Level.ERROR;
-import static java.lang.System.Logger.Level.INFO;
 
 @Slf4j
 @Service
@@ -45,20 +42,16 @@ public class EngineOrchestrationService {
     private LogService logService;
 
     public EngineEvaluation runEngine(PayloadRequest payload) {
-        var transaction = TransactionData.getTransactionData();
         try {
-            logService.logData(format("Chamando endpoint de avaliação ao motor com dados: %s. TransactionId: %s. ServiceId: %s.",
-                jsonUtil.toJson(payload), transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
+            logService.logData(format("Chamando endpoint de avaliação ao motor com dados: %s.", jsonUtil.toJson(payload)));
             var startTime = LocalDateTime.now();
             runProcess(payload);
             var engineEvaluation = EngineEvaluation.convertFrom(payload, startTime);
             var response = engineEvaluationRepository.save(engineEvaluation);
-            logService.logData(format("Resposta da avaliação ao motor com dados: %s. TransactionId: %s. ServiceId: %s.",
-                jsonUtil.toJson(response), transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
+            logService.logData(format("Resposta da avaliação ao motor com dados: %s.", jsonUtil.toJson(response)));
             return response;
         } catch (Exception ex) {
-            logService.logData(format("Erro ao tentar processar avaliação do motor. TransactionId: %s, ServiceId: %s.",
-                transaction.getTransactionId(), transaction.getServiceId()), ERROR, ex);
+            logService.logData("Erro ao tentar processar avaliação do motor.", ex);
             throw new ValidacaoException(format("Erro ao tentar processar os dados no motor de decisão: %s", ex.getMessage()));
         }
     }
@@ -115,33 +108,25 @@ public class EngineOrchestrationService {
     }
 
     public EngineEvaluation findById(String id) {
-        var transaction = TransactionData.getTransactionData();
         try {
-            logService.logData(format("Iniciando consulta de avaliação por ID %s. TransactionId: %s, ServiceId: %s.",
-                id, transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
+            logService.logData(format("Iniciando consulta de avaliação por ID %s.", id));
             var response = findByMongoId(id);
-            logService.logData(format("Resposta da consulta de avaliação por ID %s: %s. TransactionId: %s, ServiceId: %s.",
-                id, jsonUtil.toJson(response), transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
+            logService.logData(format("Resposta da consulta de avaliação por ID %s: %s.", id, jsonUtil.toJson(response)));
             return response;
         } catch (Exception ex) {
-            logService.logData(format("Não foi encontrada uma avaliação pelo ID %s. TransactionId: %s, ServiceId: %s.",
-                id, transaction.getTransactionId(), transaction.getServiceId()), ERROR, ex);
+            logService.logData(format("Não foi encontrada uma avaliação pelo ID %s.", id), ex);
             throw ex;
         }
     }
 
     public EngineEvaluation findByEvaluationId(String evaluationId) {
-        var transaction = TransactionData.getTransactionData();
         try {
-            logService.logData(format("Iniciando consulta de avaliação por ID do motor: %s. TransactionId: %s, ServiceId: %s.",
-                evaluationId, transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
+            logService.logData(format("Iniciando consulta de avaliação por ID do motor: %s.", evaluationId));
             var response = findByEngineId(evaluationId);
-            logService.logData(format("Resposta da consulta de avaliação por ID do motor %s: %s. TransactionId: %s, ServiceId: %s.",
-                evaluationId, jsonUtil.toJson(response), transaction.getTransactionId(), transaction.getServiceId()), INFO, null);
+            logService.logData(format("Resposta da consulta de avaliação por ID do motor %s: %s.", evaluationId, jsonUtil.toJson(response)));
             return response;
         } catch (Exception ex) {
-            logService.logData(format("Não foi encontrada um ID de avaliação pelo ID %s. TransactionId: %s, ServiceId: %s.",
-                evaluationId, transaction.getTransactionId(), transaction.getServiceId()), ERROR, ex);
+            logService.logData(format("Não foi encontrada um ID de avaliação pelo ID %s.", evaluationId), ex);
             throw ex;
         }
     }

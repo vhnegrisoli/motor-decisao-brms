@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CpfServiceResponse {
+public class BirthdayResponse {
 
-    private String cpf;
-    private boolean validCpf;
+    private Integer age;
 }

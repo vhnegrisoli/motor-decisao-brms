@@ -17,22 +17,22 @@ public class RegraCpfValido {
     public Rule avaliarRegra(PayloadProduct payloadProduct) {
         var cpf = payloadProduct.getPayload().getPessoa().getCpf();
         var apiConsultada = ConsultedApiService.getConsultedApiService(CPF_VALIDO, payloadProduct.getPayload().getApisConsultadas());
-        var dadosCpf = payloadProduct.getPayload().getDadosApis().getCpfService();
+        var dadosCpf = payloadProduct.getPayload().getDadosApis().getValidCpf();
 
         if (isEmpty(cpf)) {
             return Rule.createRuleWithStatus(REPROVADA, REGRA_AVALIAR_CPF_VALIDO, "O CPF está nulo para avaliação.");
         }
 
         if (isEmpty(apiConsultada)) {
-            return Rule.createRuleWithPendingService(CPF_VALIDO, REGRA_AVALIAR_CPF_VALIDO, "O serviço de CPF ainda não foi consultado.");
+            return Rule.createRuleWithPendingService(CPF_VALIDO, REGRA_AVALIAR_CPF_VALIDO, "O serviço de CPF válido ainda não foi consultado.");
         }
 
         if (!apiConsultada.isSucesso()) {
-            return Rule.createRuleWithStatus(REPROVADA, REGRA_AVALIAR_CPF_VALIDO, "O serviço de CPF falhou na consulta.");
+            return Rule.createRuleWithStatus(REPROVADA, REGRA_AVALIAR_CPF_VALIDO, "O serviço de CPF válido falhou na consulta.");
         }
 
         if (apiConsultada.isSucesso() && isEmpty(dadosCpf.getCpf())) {
-           return Rule.createRuleWithStatus(REPROVADA, REGRA_AVALIAR_CPF_VALIDO, "O serviço de CPF não retornou dados.");
+           return Rule.createRuleWithStatus(REPROVADA, REGRA_AVALIAR_CPF_VALIDO, "O serviço de CPF válido não retornou dados.");
         }
 
         if (!dadosCpf.isValidCpf()) {

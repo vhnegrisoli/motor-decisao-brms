@@ -4,7 +4,6 @@ import br.com.decisao.motordecisao.config.JsonUtil;
 import br.com.decisao.motordecisao.config.TransactionData;
 import br.com.decisao.motordecisao.log.service.LogService;
 import br.com.decisao.motordecisao.modules.data.dto.PayloadProduct;
-import br.com.decisao.motordecisao.modules.data.dto.restclient.CleanCpfResponse;
 import br.com.decisao.motordecisao.modules.data.dto.restclient.ValidCpfResponse;
 import br.com.decisao.motordecisao.modules.data.enums.Api;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +20,7 @@ import static org.springframework.http.HttpMethod.GET;
 
 
 @Component
-public class CpfClient {
+public class CepClient {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -35,43 +34,30 @@ public class CpfClient {
     @Autowired
     private JsonUtil jsonUtil;
 
-    @Value("${app-config.services.cpf.valid}")
-    private String validCpfEndpoint;
+    @Value("${app-config.services.cep.uri}")
+    private String validCepEndpoint;
 
-    @Value("${app-config.services.cpf.clean}")
-    private String cleanCpfEndpoint;
-
-    public void callValidCpfClient(PayloadProduct payloadProduct) {
+    public void callValidCepClient(PayloadProduct payloadProduct) {
+        var transactionData = TransactionData.getTransactionData();
         try {
-            var url = buildUrl(validCpfEndpoint, payloadProduct.getPayload().getPessoa().getCpf());
-            logService.logData(format("Chamando serviço de CPF válido (%s) com dados: %s.", url, jsonUtil.toJson(payloadProduct)));
+            var url = buildUrl(validCepEndpoint, payloadProduct.getPayload().getPessoa().getCpf());
+            logService.logData(format("Chamando serviço de CPF válido (%s) com dados: %s. TransactionId: %s, ServiceId: %s",
+                url, jsonUtil.toJson(payloadProduct), transactionData.getTransactionId(), transactionData.getServiceId()));
             var response = (ValidCpfResponse) callApi(url, GET, buildHeaders(), ValidCpfResponse.class);
             payloadProduct.getPayload().getDadosApis().setValidCpf(response);
-            logService.logData(format("Resposta do serviço de CPF válido: %s.", jsonUtil.toJson(response)));
+            logService.logData(format("Resposta do serviço de CPF válido: %s. TransactionId: %s, ServiceId: %s.",
+                jsonUtil.toJson(response), transactionData.getTransactionId(), transactionData.getServiceId()));
             payloadProduct.addConsultedApi(Api.CPF_VALIDO, true, 200, null);
         } catch (Exception ex) {
-            logService.logData("Erro ao consultar serviço de CPF válido: ", ex);
-            payloadProduct.addConsultedApi(Api.CPF_VALIDO, false, 400, format("O CPF não foi encontrado: %s", ex.getMessage()));
-        }
-    }
-
-    public void callCleanCpfClient(PayloadProduct payloadProduct) {
-        try {
-            var url = buildUrl(cleanCpfEndpoint, payloadProduct.getPayload().getPessoa().getCpf());
-            logService.logData(format("Chamando serviço de CPF limpo (%s) com dados: %s.", url, jsonUtil.toJson(payloadProduct)));
-            var response = (CleanCpfResponse) callApi(url, GET, buildHeaders(), ValidCpfResponse.class);
-            payloadProduct.getPayload().getDadosApis().setCleanCpf(response);
-            logService.logData(format("Resposta do serviço de CPF limpo: %s.", jsonUtil.toJson(response)));
-            payloadProduct.addConsultedApi(Api.CPF_LIMPO, true, 200, null);
-        } catch (Exception ex) {
-            logService.logData("Erro ao consultar serviço de CPF limpo.", ex);
-            payloadProduct.addConsultedApi(Api.CPF_LIMPO, false, 400, format("O CPF não foi encontrado: %s", ex.getMessage()));
+            logService.logData(format("TransactionId: %s, ServiceId: %s. Erro ao consultar serviço de CPF válido: ",
+                transactionData.getTransactionId(), transactionData.getServiceId()), ex);
+            payloadProduct.addConsultedApi(Api.CPF_VALIDO, false, 400, format("O CEP não foi encontrado: %s", ex.getMessage()));
         }
     }
 
     private String buildUrl(String url,
-                            String cpf) {
-        return format(url, cpf);
+                            String cep) {
+        return format(url, cep);
     }
 
     private HttpHeaders buildHeaders() {

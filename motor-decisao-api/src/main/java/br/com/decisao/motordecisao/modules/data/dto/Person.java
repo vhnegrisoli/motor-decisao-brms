@@ -20,4 +20,7 @@ public class Person {
     @JsonProperty("birthday")
     private LocalDate dataNascimento;
 
+    @JsonProperty("postcode")
+    private String cep;
+
 }
