@@ -62,9 +62,6 @@ public class EngineEvaluation {
     }
 
     private static Long getTotalTime(Duration tempoTotal) {
-        if (tempoTotal.getSeconds() <= ZERO) {
-            return TimeUnit.MILLISECONDS.convert(tempoTotal.getNano(), TimeUnit.NANOSECONDS);
-        }
-        return tempoTotal.getSeconds();
+        return TimeUnit.MILLISECONDS.convert(tempoTotal.getNano(), TimeUnit.NANOSECONDS);
     }
 }

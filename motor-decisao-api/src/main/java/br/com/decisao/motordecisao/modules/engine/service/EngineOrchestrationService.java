@@ -76,22 +76,25 @@ public class EngineOrchestrationService {
         if (shouldEvaluate(keepRunning, REGRA_AVALIAR_IDADE_PERMITIDA, rules, payloadProduto)) {
             keepRunning = executeAndDefineNext(REGRA_AVALIAR_IDADE_PERMITIDA, payloadProduto);
         }
+        if (shouldEvaluate(keepRunning, REGRA_AVALIAR_CEP_VALIDO, rules, payloadProduto)) {
+            executeAndDefineNext(REGRA_AVALIAR_CEP_VALIDO, payloadProduto);
+        }
     }
 
     private boolean executeAndDefineNext(RuleId ruleId,
                                          PayloadProduct payloadProduto) {
         var rule = ruleExecutorService.executeRule(ruleId, payloadProduto);
-        checkPendingRule(rule, payloadProduto, ruleId);
+        rule = checkPendingRule(rule, payloadProduto, ruleId);
         addRule(rule, payloadProduto);
         return rule.isApproved();
     }
 
-    private void checkPendingRule(Rule rule, PayloadProduct payloadProduto, RuleId ruleId) {
+    private Rule checkPendingRule(Rule rule, PayloadProduct payloadProduto, RuleId ruleId) {
         if (rule.isApiPending()) {
             restCallService.callPendingApi(rule.getApiPendente(), payloadProduto);
-            rule = ruleExecutorService.executeRule(ruleId, payloadProduto);
-            addRule(rule, payloadProduto);
+            return ruleExecutorService.executeRule(ruleId, payloadProduto);
         }
+        return rule;
     }
 
     private void addRule(Rule rule, PayloadProduct payloadProduto) {

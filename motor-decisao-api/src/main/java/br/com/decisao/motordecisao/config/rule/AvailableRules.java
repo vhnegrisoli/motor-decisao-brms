@@ -20,9 +20,9 @@ public class AvailableRules {
     public static List<RuleDefinition> getRules() {
         return List.of(
             define(ALUGUEL, REGRA_AVALIAR_CPF_VALIDO, HABILITADA),
-            define(COMPRA, REGRA_AVALIAR_CPF_VALIDO, HABILITADA),
-            define(ALUGUEL, REGRA_AVALIAR_CPF_LIMPO, DESABILITADA),
-            define(ALUGUEL, REGRA_AVALIAR_IDADE_PERMITIDA, HABILITADA)
+            define(ALUGUEL, REGRA_AVALIAR_CPF_LIMPO, HABILITADA),
+            define(ALUGUEL, REGRA_AVALIAR_IDADE_PERMITIDA, HABILITADA),
+            define(ALUGUEL, REGRA_AVALIAR_CEP_VALIDO, HABILITADA)
         );
     }
 

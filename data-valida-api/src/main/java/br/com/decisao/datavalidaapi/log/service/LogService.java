@@ -1,8 +1,8 @@
-package br.com.decisao.motordecisao.log.service;
+package br.com.decisao.datavalidaapi.log.service;
 
-import br.com.decisao.motordecisao.config.TransactionData;
-import br.com.decisao.motordecisao.log.dto.LogMessage;
-import br.com.decisao.motordecisao.log.sender.LogSender;
+import br.com.decisao.datavalidaapi.config.TransactionData;
+import br.com.decisao.datavalidaapi.log.dto.LogMessage;
+import br.com.decisao.datavalidaapi.log.sender.LogSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

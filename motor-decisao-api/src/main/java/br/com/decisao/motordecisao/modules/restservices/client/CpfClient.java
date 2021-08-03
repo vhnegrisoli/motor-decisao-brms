@@ -1,7 +1,6 @@
 package br.com.decisao.motordecisao.modules.restservices.client;
 
 import br.com.decisao.motordecisao.config.JsonUtil;
-import br.com.decisao.motordecisao.config.TransactionData;
 import br.com.decisao.motordecisao.log.service.LogService;
 import br.com.decisao.motordecisao.modules.data.dto.PayloadProduct;
 import br.com.decisao.motordecisao.modules.data.dto.restclient.CleanCpfResponse;
@@ -11,14 +10,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import static br.com.decisao.motordecisao.config.HttpHeaderUtil.buildHeaders;
 import static java.lang.String.format;
 import static org.springframework.http.HttpMethod.GET;
-
 
 @Component
 public class CpfClient {
@@ -45,7 +43,7 @@ public class CpfClient {
         try {
             var url = buildUrl(validCpfEndpoint, payloadProduct.getPayload().getPessoa().getCpf());
             logService.logData(format("Chamando serviço de CPF válido (%s) com dados: %s.", url, jsonUtil.toJson(payloadProduct)));
-            var response = (ValidCpfResponse) callApi(url, GET, buildHeaders(), ValidCpfResponse.class);
+            var response = (ValidCpfResponse) callApi(url, ValidCpfResponse.class);
             payloadProduct.getPayload().getDadosApis().setValidCpf(response);
             logService.logData(format("Resposta do serviço de CPF válido: %s.", jsonUtil.toJson(response)));
             payloadProduct.addConsultedApi(Api.CPF_VALIDO, true, 200, null);
@@ -59,7 +57,7 @@ public class CpfClient {
         try {
             var url = buildUrl(cleanCpfEndpoint, payloadProduct.getPayload().getPessoa().getCpf());
             logService.logData(format("Chamando serviço de CPF limpo (%s) com dados: %s.", url, jsonUtil.toJson(payloadProduct)));
-            var response = (CleanCpfResponse) callApi(url, GET, buildHeaders(), ValidCpfResponse.class);
+            var response = (CleanCpfResponse) callApi(url, CleanCpfResponse.class);
             payloadProduct.getPayload().getDadosApis().setCleanCpf(response);
             logService.logData(format("Resposta do serviço de CPF limpo: %s.", jsonUtil.toJson(response)));
             payloadProduct.addConsultedApi(Api.CPF_LIMPO, true, 200, null);
@@ -74,19 +72,10 @@ public class CpfClient {
         return format(url, cpf);
     }
 
-    private HttpHeaders buildHeaders() {
-        var transactionData = TransactionData.getTransactionData();
-        var headers = new HttpHeaders();
-        headers.set("transactionId", transactionData.getTransactionId());
-        return headers;
-    }
-
-    private <T> Object callApi(String url,
-                               HttpMethod httpMethod,
-                               HttpHeaders headers,
+    private Object callApi(String url,
                                Class objectClass) {
         return restTemplate
-            .exchange(url, httpMethod, new HttpEntity<>(buildHeaders()), objectClass)
+            .exchange(url, GET, new HttpEntity<>(buildHeaders()), objectClass)
             .getBody();
     }
 }

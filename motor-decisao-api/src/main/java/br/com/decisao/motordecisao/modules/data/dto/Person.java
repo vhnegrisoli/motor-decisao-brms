@@ -1,12 +1,10 @@
 package br.com.decisao.motordecisao.modules.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @Data
 @Builder
@@ -18,7 +16,7 @@ public class Person {
     private String cpf;
 
     @JsonProperty("birthday")
-    private LocalDate dataNascimento;
+    private String dataNascimento;
 
     @JsonProperty("postcode")
     private String cep;

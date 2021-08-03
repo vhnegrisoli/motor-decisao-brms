@@ -1,4 +1,4 @@
-package br.com.decisao.cpflimpoapi.config;
+package br.com.decisao.datavalidaapi.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
