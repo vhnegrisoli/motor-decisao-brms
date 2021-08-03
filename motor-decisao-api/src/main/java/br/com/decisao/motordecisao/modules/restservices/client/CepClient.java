@@ -36,14 +36,14 @@ public class CepClient {
 
     public void callValidCepClient(PayloadProduct payloadProduct) {
         try {
-            var url = buildUrl(validCepEndpoint, payloadProduct.getPayload().getPessoa().getCpf());
+            var url = buildUrl(validCepEndpoint, payloadProduct.getPayload().getPessoa().getCep());
             logService.logData(format("Chamando serviço de CEP válido (%s) com dados: %s.", url, jsonUtil.toJson(payloadProduct)));
             var response = restTemplate.exchange(url, GET, new HttpEntity<>(buildHeaders()), ValidCepResponse.class).getBody();
             payloadProduct.getPayload().getDadosApis().setCep(response);
-            logService.logData(format("Resposta do serviço de CPF válido: %s.", jsonUtil.toJson(response)));
+            logService.logData(format("Resposta do serviço de CEP válido: %s.", jsonUtil.toJson(response)));
             payloadProduct.addConsultedApi(Api.CEP, true, 200, null);
         } catch (Exception ex) {
-            logService.logData("Erro ao consultar serviço de CPF válido.", ex);
+            logService.logData("Erro ao consultar serviço de CEP válido.", ex);
             payloadProduct.addConsultedApi(Api.CEP, false, 400, format("O CEP não foi encontrado: %s", ex.getMessage()));
         }
     }

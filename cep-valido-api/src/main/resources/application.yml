@@ -1,0 +1,31 @@
+server:
+  port: 8082
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+
+rabbit:
+  exchange:
+    log-data: log-data.topic
+
+  routingkey:
+    log-data: log-data.routingkey
+
+  queue:
+    log-data: log-data.queue
+
+app-config:
+  services:
+    viacep:
+      uri: https://viacep.com.br/ws/
