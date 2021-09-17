@@ -11,7 +11,7 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/cpf-passlist
+    url: jdbc:postgresql://${CPF_LIMPO_HOST:localhost}:5432/cpf-passlist
     username: postgres
     password: 1y5h8j
     initialization-mode: always
@@ -31,7 +31,7 @@ spring:
           lob.non_contextual_creation: true
 
   rabbitmq:
-    host: localhost
+    host: ${RABBIT_MQ_HOST:localhost}
     port: 5672
     username: guest
     password: guest

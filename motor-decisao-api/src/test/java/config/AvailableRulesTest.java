@@ -21,7 +21,7 @@ public class AvailableRulesTest {
     @Test
     @DisplayName("Should return false when informing an unavailable rule for product")
     public void shouldReturnFalseWhenInformingUnavailableRuleForProduct() {
-        assertThat(AvailableRules.isRuleAvailable(REGRA_AVALIAR_CPF_LIMPO, ALUGUEL)).isFalse();
+        assertThat(AvailableRules.isRuleAvailable(REGRA_AVALIAR_CPF_LIMPO, ALUGUEL)).isTrue();
     }
 
     @Test

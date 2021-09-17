@@ -1,6 +1,8 @@
 version: '3'
 services:
 
+  # Determinando serviços de bases de dados e mensagerias
+
   motor-decisao-db:
     image: tutum/mongodb
     container_name: motor-decisao-db
@@ -13,6 +15,40 @@ services:
       - '27017:27017'
       - '28017:28017'
 
+  log-db:
+    image: tutum/mongodb
+    container_name: log-db
+    restart: always
+    networks:
+      - motor-decisao
+    environment:
+      - AUTH=no
+    ports:
+      - '29017:27017'
+      - '30017:28017'
+
+  brms-rabbit:
+      image: rabbitmq:3-management
+      container_name: brms-rabbit
+      hostname: brms-rabbit
+      ports:
+        - '5672:5672'
+        - '25676:25676'
+        - '15672:15672'
+
+  cpf-limpo-db:
+    image: postgres
+    container_name: cpf-limpo-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1y5h8j
+      POSTGRES_DB: cpf-passlist
+    ports:
+      - '5432:5432'
+
+  # Definindo as APIs
+
   motor-decisao-api:
     build: './motor-decisao-api'
     container_name: motor-decisao-api
@@ -22,10 +58,69 @@ services:
       - motor-decisao
     depends_on:
       - motor-decisao-db
+      - brms-rabbit
     environment:
       - MONGO_DB_HOST=motor-decisao-db
       - MONGO_DB_PORT=27017
       - MONGO_DB_COLLECTION=decision-engine
+      - CPF_LIMPO_API=cpf-limpo-api:8081
+      - CEP_VALIDO_API=cep-valido-api:8082
+      - DATA_VALIDA_API=data-valida-api:8083
+      - RABBIT_MQ_HOST=brms-rabbit
+
+  cpf-limpo-api:
+    build: './cpf-limpo-api'
+    container_name: cpf-limpo-api
+    ports:
+      - 8081:8081
+    networks:
+      - motor-decisao
+    depends_on:
+      - cpf-limpo-db
+      - brms-rabbit
+    environment:
+      - RABBIT_MQ_HOST=brms-rabbit
+      - CPF_LIMPO_HOST=cpf-limpo-db
+
+  cep-valido-api:
+    build: './cep-valido-api'
+    container_name: cep-valido-api
+    ports:
+      - 8082:8082
+    networks:
+      - motor-decisao
+    depends_on:
+      - brms-rabbit
+    environment:
+      - RABBIT_MQ_HOST=brms-rabbit
+
+  data-valida-api:
+    build: './data-valida-api'
+    container_name: data-valida-api
+    ports:
+      - 8083:8083
+    networks:
+      - motor-decisao
+    depends_on:
+      - brms-rabbit
+    environment:
+      - RABBIT_MQ_HOST=brms-rabbit
+
+  log-api:
+    build: './log-api'
+    container_name: log-api
+    ports:
+      - 3000:3000
+    networks:
+      - motor-decisao
+    depends_on:
+      - log-db
+      - brms-rabbit
+    environment:
+      - MONGO_DB_HOST=logs-db
+      - MONGO_DB_PORT=29017
+      - MONGO_DB_COLLECTION=logs
+      - RABBIT_MQ_HOST=brms-rabbit
 
 networks:
   motor-decisao:
