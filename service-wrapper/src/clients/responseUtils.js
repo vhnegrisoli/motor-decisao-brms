@@ -6,5 +6,7 @@ export function getResponseData(serviceId, returnType) {
     data: returnType === "OBJECT" ? {} : [],
     success: false,
     serviceId,
+    status: null,
+    reason: null,
   };
 }
