@@ -23,6 +23,8 @@ spring:
 
 app-config:
   services:
+    wrapper:
+      uri: http://${WRAPPER_API:localhost:3000}/api/wrapper
     cpf:
       uri: http://${CPF_LIMPO_API:localhost:8081}/api/v1/cpf/
       valid: ${app-config.services.cpf.uri}%s/valido

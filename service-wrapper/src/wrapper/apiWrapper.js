@@ -11,11 +11,12 @@ export async function getApiWrapper(data, headers) {
     validateInformedTransactionId(headers);
     switch (data.serviceId) {
       case api.CALCULO_IDADE:
-        data = await callAgeApi(data, headers.transactionid);
+        data.payload = await callAgeApi(data.payload, headers.transactionid);
         break;
       default:
         throw new WrapperException(BAD_REQUEST, "Nothing was consulted.");
     }
+    delete data.serviceId;
     return data;
   } catch (error) {
     return {
