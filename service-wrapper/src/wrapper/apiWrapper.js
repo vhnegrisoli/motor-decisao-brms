@@ -1,4 +1,6 @@
-import { callAgeApi } from "../clients/IdadeClient.js";
+import {
+  callAgeApi
+} from "../clients/IdadeClient.js";
 import WrapperException from "../exception/WrapperException.js";
 import * as api from "./services.js";
 
@@ -9,12 +11,15 @@ export async function getApiWrapper(data, headers) {
   try {
     validateInformedServiceId(data);
     validateInformedTransactionId(headers);
-    switch (data.serviceId) {
-      case api.CALCULO_IDADE:
-        data.payload = await callAgeApi(data.payload, headers.transactionid);
-        break;
-      default:
-        throw new WrapperException(BAD_REQUEST, "Nothing was consulted.");
+    console.log(isNotConsultedService(data))
+    if (isNotConsultedService(data)) {
+      switch (data.serviceId) {
+        case api.CALCULO_IDADE:
+          data = await callAgeApi(data, headers.transactionid);
+          break;
+        default:
+          throw new WrapperException(BAD_REQUEST, "Nothing was consulted.");
+      }
     }
     delete data.serviceId;
     return data;
@@ -39,4 +44,15 @@ function validateInformedTransactionId(headers) {
       "The transactionId must be informed."
     );
   }
+}
+
+function isNotConsultedService(data) {
+  if (data.payload.consultedApis) {
+    let filteredBureau = data.payload.consultedApis.filter(api => {
+      return api.serviceId === data.serviceId
+    })
+    console.log()
+    return !filteredBureau || filteredBureau.length === 0;
+  }
+  return false;
 }

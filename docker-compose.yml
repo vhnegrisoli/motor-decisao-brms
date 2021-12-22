@@ -12,8 +12,8 @@ services:
     environment:
       - AUTH=no
     ports:
-      - '27017:27017'
-      - '28017:28017'
+      - 27017:27017
+      - 28017:28017
 
   log-db:
     image: tutum/mongodb
@@ -24,30 +24,48 @@ services:
     environment:
       - AUTH=no
     ports:
-      - '29017:27017'
-      - '30017:28017'
+      - 29017:27017
+      - 30017:28017
 
   brms-rabbit:
-      image: rabbitmq:3-management
-      container_name: brms-rabbit
-      hostname: brms-rabbit
-      ports:
-        - '5672:5672'
-        - '25676:25676'
-        - '15672:15672'
+    image: rabbitmq:3-management
+    container_name: brms-rabbit
+    hostname: brms-rabbit,
+    networks:
+      - motor-decisao
+    ports:
+      - 5672:5672
+      - 25676:25676
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
 
   cpf-limpo-db:
     image: postgres
     container_name: cpf-limpo-db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1y5h8j
-      POSTGRES_DB: cpf-passlist
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1y5h8j
+      - POSTGRES_DB=cpf-passlist
     ports:
-      - '5432:5432'
+      - 5432:5432
 
   # Definindo as APIs
+
+  service-wrapper:
+    build: './service-wrapper'
+    container_name: service-wrapper
+    ports:
+      - 3000:3000
+    networks:
+      - motor-decisao
+    environment:
+      - NODE_ENV=container
+      - CPF_LIMPO_API_URL=cpf-limpo-api:8081
+      - CEP_VALIDO_API_URL=cep-valido-api:8082
+      - DATA_VALIDA_API_URL=data-valida-api:8083
 
   motor-decisao-api:
     build: './motor-decisao-api'
@@ -67,6 +85,7 @@ services:
       - CEP_VALIDO_API=cep-valido-api:8082
       - DATA_VALIDA_API=data-valida-api:8083
       - RABBIT_MQ_HOST=brms-rabbit
+      - WRAPPER_API=wrapper-service:3000
 
   cpf-limpo-api:
     build: './cpf-limpo-api'
@@ -110,15 +129,15 @@ services:
     build: './log-api'
     container_name: log-api
     ports:
-      - 3000:3000
+      - 8084:8084
     networks:
       - motor-decisao
     depends_on:
       - log-db
       - brms-rabbit
     environment:
-      - MONGO_DB_HOST=logs-db
-      - MONGO_DB_PORT=29017
+      - MONGO_DB_HOST=log-db
+      - MONGO_DB_PORT=27017
       - MONGO_DB_COLLECTION=logs
       - RABBIT_MQ_HOST=brms-rabbit
 

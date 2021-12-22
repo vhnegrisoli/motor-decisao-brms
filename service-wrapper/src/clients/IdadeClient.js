@@ -1,14 +1,22 @@
 import axios from "axios";
-import { OBJECT, getResponseData } from "./responseUtils.js";
+import {
+  OBJECT,
+  getResponseData
+} from "./responseUtils.js";
+import {
+  DATA_VALIDA_API_URL
+} from '../../src/config/url.js'
 
 export async function callAgeApi(data, transactionid) {
-  let birthday = data.person.birthday;
+  let birthday = data.payload.person.birthday;
   let response = getResponseData(data.serviceId, OBJECT);
   let headers = {
     transactionId: transactionid,
   };
   await axios
-    .get(`http://localhost:8083/api/v1/idade/${birthday}`, { headers })
+    .get(`${DATA_VALIDA_API_URL}/api/v1/idade/${birthday}`, {
+      headers
+    })
     .then((res) => {
       response.data = res.data;
       response.status = res.status;
@@ -19,9 +27,9 @@ export async function callAgeApi(data, transactionid) {
       response.status = err.status;
       console.error(`Erro ao tentar consultar serviço: ${err.message}`);
     });
-  if (!data.consultedApis) {
-    data.consultedApis = [];
+  if (!data.payload.consultedApis) {
+    data.payload.consultedApis = [];
   }
-  data.consultedApis.push(response);
+  data.payload.consultedApis.push(response);
   return data;
 }
