@@ -1,6 +1,13 @@
 import {
   callAgeApi
 } from "../clients/IdadeClient.js";
+import {
+  callPostcodeApi
+} from "../clients/CepClient.js";
+import {
+  callValidDocumentApi,
+  callCleanDocumentApi
+} from "../clients/DocumentClient.js";
 import WrapperException from "../exception/WrapperException.js";
 import * as api from "./services.js";
 
@@ -11,11 +18,19 @@ export async function getApiWrapper(data, headers) {
   try {
     validateInformedServiceId(data);
     validateInformedTransactionId(headers);
-    console.log(isNotConsultedService(data))
     if (isNotConsultedService(data)) {
       switch (data.serviceId) {
         case api.CALCULO_IDADE:
           data = await callAgeApi(data, headers.transactionid);
+          break;
+        case api.CEP_VALIDO:
+          data = await callPostcodeApi(data, headers.transactionid);
+          break;
+        case api.CPF_VALIDO:
+          data = await callValidDocumentApi(data, headers.transactionid);
+          break;
+        case api.CPF_LIMPO:
+          data = await callCleanDocumentApi(data, headers.transactionid);
           break;
         default:
           throw new WrapperException(BAD_REQUEST, "Nothing was consulted.");
@@ -51,7 +66,6 @@ function isNotConsultedService(data) {
     let filteredBureau = data.payload.consultedApis.filter(api => {
       return api.serviceId === data.serviceId
     })
-    console.log()
     return !filteredBureau || filteredBureau.length === 0;
   }
   return false;

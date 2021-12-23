@@ -6,7 +6,7 @@ import br.com.decisao.motordecisao.modules.data.dto.Rule;
 import org.springframework.stereotype.Component;
 
 import static br.com.decisao.motordecisao.config.rule.RuleId.REGRA_AVALIAR_CEP_VALIDO;
-import static br.com.decisao.motordecisao.modules.data.enums.Api.CEP;
+import static br.com.decisao.motordecisao.modules.data.enums.Api.CEP_VALIDO;
 import static br.com.decisao.motordecisao.modules.data.enums.RuleStatus.APROVADA;
 import static br.com.decisao.motordecisao.modules.data.enums.RuleStatus.REPROVADA;
 import static org.springframework.util.ObjectUtils.isEmpty;
@@ -16,7 +16,7 @@ public class RegraCepValido {
 
     public Rule avaliarRegra(PayloadProduct payloadProduct) {
         var cep = payloadProduct.getPayload().getPessoa().getCep();
-        var apiConsultada = ConsultedApiService.getConsultedApiService(CEP, payloadProduct.getPayload().getApisConsultadas());
+        var apiConsultada = ConsultedApiService.getConsultedApiService(CEP_VALIDO, payloadProduct.getPayload().getApisConsultadas());
         var dadosCep = payloadProduct.getPayload().getDadosApis().getCep();
 
         if (isEmpty(cep)) {
@@ -24,7 +24,7 @@ public class RegraCepValido {
         }
 
         if (isEmpty(apiConsultada)) {
-            return Rule.createRuleWithPendingService(CEP, REGRA_AVALIAR_CEP_VALIDO, "O serviço de cep válido ainda não foi consultado.");
+            return Rule.createRuleWithPendingService(CEP_VALIDO, REGRA_AVALIAR_CEP_VALIDO, "O serviço de cep válido ainda não foi consultado.");
         }
 
         if (!apiConsultada.isSucesso()) {

@@ -6,7 +6,7 @@ import br.com.decisao.motordecisao.modules.data.dto.Rule;
 import org.springframework.stereotype.Component;
 
 import static br.com.decisao.motordecisao.config.rule.RuleId.REGRA_AVALIAR_IDADE_PERMITIDA;
-import static br.com.decisao.motordecisao.modules.data.enums.Api.IDADE;
+import static br.com.decisao.motordecisao.modules.data.enums.Api.CALCULO_IDADE;
 import static br.com.decisao.motordecisao.modules.data.enums.RuleStatus.APROVADA;
 import static br.com.decisao.motordecisao.modules.data.enums.RuleStatus.REPROVADA;
 import static org.springframework.util.ObjectUtils.isEmpty;
@@ -16,7 +16,7 @@ public class RegraIdadePermitida {
 
     public Rule avaliarRegra(PayloadProduct payloadProduct) {
         var dataNascimento = payloadProduct.getPayload().getPessoa().getDataNascimento();
-        var apiConsultada = ConsultedApiService.getConsultedApiService(IDADE, payloadProduct.getPayload().getApisConsultadas());
+        var apiConsultada = ConsultedApiService.getConsultedApiService(CALCULO_IDADE, payloadProduct.getPayload().getApisConsultadas());
         var dadosIdade = payloadProduct.getPayload().getDadosApis().getBirthday();
         var idadePermitida = 18;
 
@@ -25,7 +25,7 @@ public class RegraIdadePermitida {
         }
 
         if (isEmpty(apiConsultada)) {
-            return Rule.createRuleWithPendingService(IDADE, REGRA_AVALIAR_IDADE_PERMITIDA, "O serviço de Idade ainda não foi consultado.");
+            return Rule.createRuleWithPendingService(CALCULO_IDADE, REGRA_AVALIAR_IDADE_PERMITIDA, "O serviço de Idade ainda não foi consultado.");
         }
 
         if (!apiConsultada.isSucesso()) {
