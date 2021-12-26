@@ -374,7 +374,13 @@ E em sequência:
 
 Para executar o service-wrapper em Node.js, é necessário ter o Node.js 14 instalado e rodar o comando:
 
-`yarn start`
+`yarn startWindows`
+
+ou
+
+`yarn startLinux`
+
+Escolha conforme o sistema operacional que estiver utilizando.
 
 #### Executando via docker-compose
 
