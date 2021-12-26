@@ -28,18 +28,20 @@ um sistema para implementar, gerenciar e executar regras de negócio de maneira 
 * Express.js
 * Axios
 
-## Arquitetura do sistema
+### Arquitetura do sistema
 
 Serão 6 serviços:
 
-* motor-decisao-api: API que realiza a tomada de decisão das regras para os produtos. Java 11, Spring Boot, Spring Data MongoDB, MongoDB, RabbitMQ, RestTemplate.
-* service-wrapper: API wrapper que irá receber uma solicitação de algum serviço necessário para uma regra e irá redirecionar a consulta. Node.js 14, Express.js, Axios.
-* cpf-limpo-api: API que irá validar se um CPF é válido e está limpo. Java 11, Spring Boot, Spring Data JPA, PostgreSQL, RabbitMQ.
-* data-valida-api: API que irá validar uma data de nascimento e calcular a idade. Java 11, Spring Boot, RabbitMQ.
-* cep-valido-api: API que irá validar um CEP na API do ViaCep. Java 11, Spring Boot, Spring Cloud OpenFeign, RabbitMQ.
-* log-api: API que terá apenas um listener do RabbitMQ e que receberá os logs de todos os serviços, possibilitando vários filtros de consulta. Java 11, Spring Boot, Spring Data MongoDB, MongoDB, RabbitMQ.
+* **motor-decisao-api**: API que realiza a tomada de decisão das regras para os produtos. Java 11, Spring Boot, Spring Data MongoDB, MongoDB, RabbitMQ, RestTemplate.
+* **service-wrapper**: API wrapper que irá receber uma solicitação de algum serviço necessário para uma regra e irá redirecionar a consulta. Node.js 14, Express.js, Axios.
+* **cpf-limpo-api**: API que irá validar se um CPF é válido e está limpo. Java 11, Spring Boot, Spring Data JPA, PostgreSQL, RabbitMQ.
+* **data-valida-api**: API que irá validar uma data de nascimento e calcular a idade. Java 11, Spring Boot, RabbitMQ.
+* **cep-valido-api**: API que irá validar um CEP na API do ViaCep. Java 11, Spring Boot, Spring Cloud OpenFeign, RabbitMQ.
+* **log-api**: API que terá apenas um listener do RabbitMQ e que receberá os logs de todos os serviços, possibilitando vários filtros de consulta. Java 11, Spring Boot, Spring Data MongoDB, MongoDB, RabbitMQ.
 
-![Arquitetura]()
+![Arquitetura](https://github.com/vhnegrisoli/motor-decisao-brms/blob/master/Decision%20Engine%20Architecture.png)
+
+Será possível executar toda a arquitetura via **docker-compose**.
 
 ### Workflow de decisão
 
@@ -370,6 +372,10 @@ E em sequência:
 
 `gradle bootRun`
 
+Para executar o service-wrapper em Node.js, é necessário ter o Node.js 14 instalado e rodar o comando:
+
+`yarn start`
+
 #### Executando via docker-compose
 
 Basta apenas executar o comando abaixo:
@@ -382,14 +388,69 @@ Caso não queira que os logs fiquem no seu terminal, adicione a flag `-d` ao fin
 
 Toda a documentação está presente no Swagger.
 
-Hoje, a API conta com 3 endpoints, um POST para salvar uma avaliação, e dois
+Hoje, a API de tomada de decisão (motor-decisao-api) conta com 3 endpoints, um POST para salvar uma avaliação, e dois
 GET para recuperar tanto pelo ID gerado na avaliação, quanto o ID gerado pelo MongoDB.
 
-A documentação localiza-se em:
+A documentação de cada API localiza-se em:
 
-http://localhost:8080/swagger-ui.html
+http://localhost:8080/swagger-ui.html (motor-decisao-api)
+http://localhost:8081/swagger-ui.html (cpf-limpo-api)
+http://localhost:8082/swagger-ui.html (cep-valido-api)
+http://localhost:8083/swagger-ui.html (data-valida-api)
+http://localhost:8084/swagger-ui.html (log-api)
+http://localhost:3000 (service-wrapper)
 
 Porém, apenas ao acessar a URL base da API (http://localhost:8080) você já será redirecionado à documentação.
+
+A aplicação service-wrapper não possui documentação. 
+
+### Service Wrapper
+
+Endpoint: /api/wrapper
+Método:   POST
+Headers: 'transactionId: as6d5asd1a6' 
+Body:  
+
+```json
+{
+    "serviceId": "CPF_VALIDO",
+    "payload": {
+        "person": {
+            "document": "10332458954",
+            "birthday": "1998-03-31",
+            "postcode": "86010580"
+        }
+    }
+}
+```
+
+Resposta: 
+
+```json
+{
+    "payload": {
+        "person": {
+            "document": "10332458954",
+            "birthday": "1998-03-31",
+            "postcode": "86010580"
+        },
+        "consultedApis": [
+            {
+                "id": "CPF_VALIDO",
+                "status": 200,
+                "success": true,
+                "reason": null
+            }
+        ],
+        "apiData": {
+            "validCpf": {
+                "cpf": "11122233344",
+                "valid": true
+            }
+        }
+    }
+}
+```
 
 ### Testes unitários
 
