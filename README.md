@@ -24,6 +24,22 @@ um sistema para implementar, gerenciar e executar regras de negócio de maneira 
 * RestTemplate (chamadas REST entre microsserviços)
 * RabbitMQ
 * PostgreSQL
+* Node.js
+* Express.js
+* Axios
+
+## Arquitetura do sistema
+
+Serão 6 serviços:
+
+* motor-decisao-api: API que realiza a tomada de decisão das regras para os produtos. Java 11, Spring Boot, Spring Data MongoDB, MongoDB, RabbitMQ, RestTemplate.
+* service-wrapper: API wrapper que irá receber uma solicitação de algum serviço necessário para uma regra e irá redirecionar a consulta. Node.js 14, Express.js, Axios.
+* cpf-limpo-api: API que irá validar se um CPF é válido e está limpo. Java 11, Spring Boot, Spring Data JPA, PostgreSQL, RabbitMQ.
+* data-valida-api: API que irá validar uma data de nascimento e calcular a idade. Java 11, Spring Boot, RabbitMQ.
+* cep-valido-api: API que irá validar um CEP na API do ViaCep. Java 11, Spring Boot, Spring Cloud OpenFeign, RabbitMQ.
+* log-api: API que terá apenas um listener do RabbitMQ e que receberá os logs de todos os serviços, possibilitando vários filtros de consulta. Java 11, Spring Boot, Spring Data MongoDB, MongoDB, RabbitMQ.
+
+![Arquitetura]()
 
 ### Workflow de decisão
 
