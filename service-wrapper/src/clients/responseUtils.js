@@ -5,7 +5,7 @@ export function getResponseData(serviceId, returnType) {
   return {
     data: returnType === "OBJECT" ? {} : [],
     success: false,
-    serviceId,
+    id: serviceId,
     status: null,
     reason: null,
   };

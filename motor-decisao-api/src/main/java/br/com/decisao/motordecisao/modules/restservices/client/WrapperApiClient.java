@@ -33,13 +33,13 @@ public class WrapperApiClient {
     private JsonUtil jsonUtil;
 
     @Value("${app-config.services.wrapper.uri}")
-    private String wrapperApiEndpoint;
+    private String url;
 
     public void callWrapperApi(Api serviceId, PayloadProduct payloadProduct) {
         try {
             var request = new ApiWrapperData(serviceId, payloadProduct.getPayload());
             logService.logData(format("Chamando serviço Wrapper para API %s com dados: %s.", serviceId, jsonUtil.toJson(request)));
-            var response = restTemplate.exchange(wrapperApiEndpoint, POST, new HttpEntity<>(buildHeaders()), ApiWrapperData.class).getBody();
+            var response = restTemplate.exchange(url, POST, new HttpEntity<>(request, buildHeaders()), ApiWrapperData.class).getBody();
             logService.logData(format("Resposta do serviço Wrapper para a API %s: %s.", serviceId, jsonUtil.toJson(response)));
             if (!isEmpty(response) && !isEmpty(response.getPayload())) {
                 payloadProduct.setPayload(response.getPayload());

@@ -5,6 +5,7 @@ import br.com.decisao.motordecisao.config.exception.ValidacaoException;
 import br.com.decisao.motordecisao.config.rule.AvailableRules;
 import br.com.decisao.motordecisao.config.rule.RuleId;
 import br.com.decisao.motordecisao.log.service.LogService;
+import br.com.decisao.motordecisao.modules.data.dto.EngineProduct;
 import br.com.decisao.motordecisao.modules.data.dto.PayloadProduct;
 import br.com.decisao.motordecisao.modules.data.dto.PayloadRequest;
 import br.com.decisao.motordecisao.modules.data.dto.Rule;
@@ -59,12 +60,13 @@ public class EngineOrchestrationService {
     private void runProcess(PayloadRequest payload) {
         payload
             .getProdutos()
-            .forEach(produto -> evaluateRules(PayloadProduct.create(payload, produto)));
+            .forEach(produto -> evaluateRules(payload, produto));
         payload.removeNullRules();
         payload.defineDisapprovedProducts();
     }
 
-    private void evaluateRules(PayloadProduct payloadProduto) {
+    private void evaluateRules(PayloadRequest payload, EngineProduct produto) {
+        var payloadProduto = PayloadProduct.create(payload, produto);
         var keepRunning = true;
         var rules = payloadProduto.getProduto().getRegras();
         if (shouldEvaluate(keepRunning, REGRA_AVALIAR_CPF_VALIDO, rules, payloadProduto)) {
@@ -79,6 +81,8 @@ public class EngineOrchestrationService {
         if (shouldEvaluate(keepRunning, REGRA_AVALIAR_CEP_VALIDO, rules, payloadProduto)) {
             executeAndDefineNext(REGRA_AVALIAR_CEP_VALIDO, payloadProduto);
         }
+        payload.setApisConsultadas(payloadProduto.getPayload().getApisConsultadas());
+        payload.setDadosApis(payloadProduto.getPayload().getDadosApis());
     }
 
     private boolean executeAndDefineNext(RuleId ruleId,

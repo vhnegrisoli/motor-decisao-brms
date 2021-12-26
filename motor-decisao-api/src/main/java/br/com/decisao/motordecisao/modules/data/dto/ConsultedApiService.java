@@ -2,6 +2,7 @@ package br.com.decisao.motordecisao.modules.data.dto;
 
 import br.com.decisao.motordecisao.modules.data.enums.Api;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class ConsultedApiService {
 

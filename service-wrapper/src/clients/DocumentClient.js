@@ -1,12 +1,6 @@
 import axios from "axios";
-import {
-  OBJECT,
-  getResponseData
-} from "./responseUtils.js";
-import {
-  CPF_API_URL
-}
-from '../config/url.js'
+import { OBJECT, getResponseData } from "./responseUtils.js";
+import { CPF_API_URL } from "../config/url.js";
 
 export async function callValidDocumentApi(data, transactionid) {
   let document = data.payload.person.document;
@@ -16,10 +10,10 @@ export async function callValidDocumentApi(data, transactionid) {
   };
   await axios
     .get(`${CPF_API_URL}/api/v1/cpf/${document}/valido`, {
-      headers
+      headers,
     })
     .then((res) => {
-      response.data = res.data;
+      data.payload.apiData.validCpf = res.data;
       response.status = res.status;
       response.success = true;
     })
@@ -43,10 +37,10 @@ export async function callCleanDocumentApi(data, transactionid) {
   };
   await axios
     .get(`${CPF_API_URL}/api/v1/cpf/${document}/limpo`, {
-      headers
+      headers,
     })
     .then((res) => {
-      response.data = res.data;
+      data.payload.apiData.cleanCpf = res.data;
       response.status = res.status;
       response.success = true;
     })

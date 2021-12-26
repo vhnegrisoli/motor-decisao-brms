@@ -1,11 +1,6 @@
 import axios from "axios";
-import {
-  OBJECT,
-  getResponseData
-} from "./responseUtils.js";
-import {
-  DATA_VALIDA_API_URL
-} from '../../src/config/url.js'
+import { OBJECT, getResponseData } from "./responseUtils.js";
+import { DATA_VALIDA_API_URL } from "../../src/config/url.js";
 
 export async function callAgeApi(data, transactionid) {
   let birthday = data.payload.person.birthday;
@@ -15,10 +10,10 @@ export async function callAgeApi(data, transactionid) {
   };
   await axios
     .get(`${DATA_VALIDA_API_URL}/api/v1/idade/${birthday}`, {
-      headers
+      headers,
     })
     .then((res) => {
-      response.data = res.data;
+      data.payload.apiData.birthday = res.data;
       response.status = res.status;
       response.success = true;
     })

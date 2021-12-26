@@ -1,11 +1,6 @@
 import axios from "axios";
-import {
-  OBJECT,
-  getResponseData
-} from "./responseUtils.js";
-import {
-  CEP_VALIDO_API_URL
-} from '../config/url.js'
+import { OBJECT, getResponseData } from "./responseUtils.js";
+import { CEP_VALIDO_API_URL } from "../config/url.js";
 
 export async function callPostcodeApi(data, transactionid) {
   let postcode = data.payload.person.postcode;
@@ -15,10 +10,10 @@ export async function callPostcodeApi(data, transactionid) {
   };
   await axios
     .get(`${CEP_VALIDO_API_URL}/api/v1/cep/${postcode}`, {
-      headers
+      headers,
     })
     .then((res) => {
-      response.data = res.data;
+      data.payload.apiData.cep = res.data;
       response.status = res.status;
       response.success = true;
     })

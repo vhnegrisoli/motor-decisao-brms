@@ -1,12 +1,8 @@
-import {
-  callAgeApi
-} from "../clients/IdadeClient.js";
-import {
-  callPostcodeApi
-} from "../clients/CepClient.js";
+import { callAgeApi } from "../clients/IdadeClient.js";
+import { callPostcodeApi } from "../clients/CepClient.js";
 import {
   callValidDocumentApi,
-  callCleanDocumentApi
+  callCleanDocumentApi,
 } from "../clients/DocumentClient.js";
 import WrapperException from "../exception/WrapperException.js";
 import * as api from "./services.js";
@@ -63,9 +59,9 @@ function validateInformedTransactionId(headers) {
 
 function isNotConsultedService(data) {
   if (data.payload.consultedApis) {
-    let filteredBureau = data.payload.consultedApis.filter(api => {
-      return api.serviceId === data.serviceId
-    })
+    let filteredBureau = data.payload.consultedApis.filter((api) => {
+      return api.serviceId === data.serviceId;
+    });
     return !filteredBureau || filteredBureau.length === 0;
   }
   return false;

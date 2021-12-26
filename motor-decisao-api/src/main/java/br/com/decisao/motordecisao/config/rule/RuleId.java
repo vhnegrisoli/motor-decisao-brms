@@ -1,6 +1,6 @@
 package br.com.decisao.motordecisao.config.rule;
 
-public enum  RuleId {
+public enum RuleId {
 
     REGRA_AVALIAR_CPF_VALIDO,
     REGRA_AVALIAR_IDADE_PERMITIDA,
