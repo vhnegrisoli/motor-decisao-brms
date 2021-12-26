@@ -45,6 +45,8 @@ services:
     image: postgres
     container_name: cpf-limpo-db
     restart: always
+    networks:
+      - motor-decisao
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=1y5h8j
@@ -85,7 +87,7 @@ services:
       - CEP_VALIDO_API=cep-valido-api:8082
       - DATA_VALIDA_API=data-valida-api:8083
       - RABBIT_MQ_HOST=brms-rabbit
-      - WRAPPER_API=wrapper-service:3000
+      - WRAPPER_API=service-wrapper:3000
 
   cpf-limpo-api:
     build: './cpf-limpo-api'

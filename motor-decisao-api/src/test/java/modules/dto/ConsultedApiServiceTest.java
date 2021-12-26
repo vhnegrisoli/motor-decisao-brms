@@ -29,7 +29,7 @@ public class ConsultedApiServiceTest {
     public void shouldReturnNullWhenInformingNotExistingApiId() {
         var givenApiServiceList = Collections.singletonList(getOneConsultedApiService());
 
-        assertThat(ConsultedApiService.getConsultedApiService(Api.CEP, givenApiServiceList)).isNull();
+        assertThat(ConsultedApiService.getConsultedApiService(Api.CEP_VALIDO, givenApiServiceList)).isNull();
     }
 
     @Test
