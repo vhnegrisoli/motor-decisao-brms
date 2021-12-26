@@ -393,12 +393,12 @@ GET para recuperar tanto pelo ID gerado na avaliação, quanto o ID gerado pelo 
 
 A documentação de cada API localiza-se em:
 
-http://localhost:8080/swagger-ui.html (motor-decisao-api)
-http://localhost:8081/swagger-ui.html (cpf-limpo-api)
-http://localhost:8082/swagger-ui.html (cep-valido-api)
-http://localhost:8083/swagger-ui.html (data-valida-api)
-http://localhost:8084/swagger-ui.html (log-api)
-http://localhost:3000 (service-wrapper)
+* http://localhost:8080/swagger-ui.html (motor-decisao-api)
+* http://localhost:8081/swagger-ui.html (cpf-limpo-api)
+* http://localhost:8082/swagger-ui.html (cep-valido-api)
+* http://localhost:8083/swagger-ui.html (data-valida-api)
+* http://localhost:8084/swagger-ui.html (log-api)
+* http://localhost:3000 (service-wrapper)
 
 Porém, apenas ao acessar a URL base da API (http://localhost:8080) você já será redirecionado à documentação.
 
@@ -406,9 +406,12 @@ A aplicação service-wrapper não possui documentação.
 
 ### Service Wrapper
 
+```
 Endpoint: /api/wrapper
 Método:   POST
 Headers: 'transactionId: as6d5asd1a6' 
+```
+
 Body:  
 
 ```json
