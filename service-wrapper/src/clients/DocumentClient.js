@@ -20,7 +20,9 @@ export async function callValidDocumentApi(data, transactionid) {
     .catch((err) => {
       response.reason = err.message;
       response.status = err.status;
-      console.error(`Erro ao tentar consultar serviço: ${err.message}`);
+      console.error(
+        `Erro ao tentar consultar serviço ${data.serviceId}: ${err.message}`
+      );
     });
   if (!data.payload.consultedApis) {
     data.payload.consultedApis = [];

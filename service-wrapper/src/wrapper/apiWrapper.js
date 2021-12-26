@@ -15,6 +15,9 @@ export async function getApiWrapper(data, headers) {
     validateInformedServiceId(data);
     validateInformedTransactionId(headers);
     if (isNotConsultedService(data)) {
+      if (!data.payload.apiData) {
+        data.payload.apiData = {};
+      }
       switch (data.serviceId) {
         case api.CALCULO_IDADE:
           data = await callAgeApi(data, headers.transactionid);
@@ -60,9 +63,9 @@ function validateInformedTransactionId(headers) {
 function isNotConsultedService(data) {
   if (data.payload.consultedApis) {
     let filteredBureau = data.payload.consultedApis.filter((api) => {
-      return api.serviceId === data.serviceId;
+      return api.id === data.serviceId;
     });
     return !filteredBureau || filteredBureau.length === 0;
   }
-  return false;
+  return true;
 }

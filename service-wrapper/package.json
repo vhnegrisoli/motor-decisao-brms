@@ -5,7 +5,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "NODE_ENV=dev node app.js"
+    "startWindows": "set NODE_ENV=dev&& node app.js",
+    "startLinux": "NODE_ENV=dev node app.js"
   },
   "dependencies": {
     "axios": "^0.24.0",
