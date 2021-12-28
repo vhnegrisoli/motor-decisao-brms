@@ -337,8 +337,8 @@ Resposta:
     }
   ],
   "apiData": {
-    "cpfService": {
-      "cpf": null,
+    "validCpf": {
+      "cpf": "97552035080",
       "validCpf": false
     }
   },
@@ -404,62 +404,11 @@ A documentação de cada API localiza-se em:
 * http://localhost:8082/swagger-ui.html (cep-valido-api)
 * http://localhost:8083/swagger-ui.html (data-valida-api)
 * http://localhost:8084/swagger-ui.html (log-api)
-* http://localhost:3000 (service-wrapper)
+* http://localhost:3000/swagger-ui.html (service-wrapper)
 
 Porém, apenas ao acessar a URL base da API (http://localhost:8080) você já será redirecionado à documentação.
 
-A aplicação service-wrapper não possui documentação. 
-
-### Service Wrapper
-
-```
-Endpoint: /api/wrapper
-Método:   POST
-Headers: 'transactionId: as6d5asd1a6' 
-```
-
-Body:  
-
-```json
-{
-    "serviceId": "CPF_VALIDO",
-    "payload": {
-        "person": {
-            "document": "10332458954",
-            "birthday": "1998-03-31",
-            "postcode": "86010580"
-        }
-    }
-}
-```
-
-Resposta: 
-
-```json
-{
-    "payload": {
-        "person": {
-            "document": "10332458954",
-            "birthday": "1998-03-31",
-            "postcode": "86010580"
-        },
-        "consultedApis": [
-            {
-                "id": "CPF_VALIDO",
-                "status": 200,
-                "success": true,
-                "reason": null
-            }
-        ],
-        "apiData": {
-            "validCpf": {
-                "cpf": "11122233344",
-                "valid": true
-            }
-        }
-    }
-}
-```
+A aplicação service-wrapper não possui documentação.
 
 ### Testes unitários
 
