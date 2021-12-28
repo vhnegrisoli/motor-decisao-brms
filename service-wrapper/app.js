@@ -1,10 +1,22 @@
 import express from "express";
+import swaggerUi from 'swagger-ui-express';
+import {
+  SWAGGER_DOCS
+}
+from './src/config/swagger.js';
+
+import {
+  getApiWrapper
+} from "./src/wrapper/apiWrapper.js";
 
 const app = express();
 
 app.use(express.json());
+app.use('/swagger-ui.html', swaggerUi.serve, swaggerUi.setup(SWAGGER_DOCS));
 
-import { getApiWrapper } from "./src/wrapper/apiWrapper.js";
+app.get("/", (req, res) => {
+  return res.redirect("/swagger-ui.html");
+});
 
 app.post("/api/wrapper", async (req, res) => {
   let data = req.body;
